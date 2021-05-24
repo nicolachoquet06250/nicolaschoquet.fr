@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation</title>
+    <script type="module" src="../components/index.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row p-1">
+            <div class="col-12 col-md pb-1">
+                <k-button type="classic" primary="false" secondary="true" size="big">
+                    Créer votre compte
+                </k-button>
+            </div>
+
+            <div class="col pb-1">
+                <k-switch checked="true"></k-switch>
+            </div>
+
+            <div class="col pb-1">
+                <k-switch checked="true" on-icon="../components/moon-regular.svg" off-icon="../components/sun-regular.svg"></k-switch>
+            </div>
+
+            <div class="col pb-1">
+                <k-switch type="radio" name="radio" checked="true" on-icon="../components/moon-regular.svg" off-icon="../components/sun-regular.svg"></k-switch>
+            </div>
+
+            <div class="col pb-1">
+                <k-switch type="radio" name="radio" checked="false"></k-switch>
+            </div>
+        </div>
+
+        <div class="row p-1">
+            <div class="col-12 col-md pb-1">
+                <k-input type="text" value="" placeholder="Ceci est un placeholder"></k-input>
+            </div>
+
+            <div class="col-12 col-md pb-1">
+                <k-input type="textarea" value="test" placeholder="Ceci est un placeholder"></k-input>
+            </div>
+
+            <div class="col-12 col-md pb-1">
+                <k-select>
+                    <k-option>test</k-option>
+
+                    <k-option>test 2</k-option>
+                </k-select>
+            </div>
+        </div>
+
+        <div class="row p-1">
+            <div class="col">
+                <k-image src="/documentation/norsys.png" width="136" height="142"></k-image>
+            </div>
+
+            <div class="col">
+                <k-image src="/documentation/norsys2.png" width="136" height="142" debug="false"></k-image>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

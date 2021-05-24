@@ -1,0 +1,26 @@
+{
+    "name": "nchoquet/nicolaschoquet.fr",
+    "description": "Mon site perso",
+    "type": "project",
+    "require": {
+        "nicolachoquet06250/php-lib": "^1.0",
+        "nicolachoquet06250/php-lib-orm": "^1.0"
+    }
+,
+    "require-dev": {
+        "roave/security-advisories": "dev-latest"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Choquet",
+            "email": "nicolachoquet06250@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "NC\\": "src"
+        }
+    }
+}
