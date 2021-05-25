@@ -24,7 +24,5 @@ class Json extends AttributeBase {
 				return $c;
 			}, $routes);
 		}
-
-
 	}
 }

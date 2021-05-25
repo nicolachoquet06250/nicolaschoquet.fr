@@ -2,12 +2,16 @@
 
 namespace NC\controllers\errors;
 
+use NC\decorators\ErrorJson;
 use PhpLib\decorators\ErrorRoute;
 use PhpLib\routing\Router;
 
-#[ErrorRoute(Router::BAD_REQUEST)]
+#[
+	ErrorJson('/api/.*'),
+	ErrorRoute(Router::BAD_REQUEST)
+]
 class BadRequest extends HttpError {
-	public function get(): void {
-		echo $this->message;
+	public function get(): string {
+		return $this->message;
 	}
 }

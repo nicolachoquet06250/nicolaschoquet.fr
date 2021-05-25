@@ -1,11 +1,10 @@
 <?php
 ini_set('display_errors', 'on');
+error_reporting(E_ALL);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use NC\helpers\ModelContainer;
-use NC\models\User as UserModel;
-use PhpLib\ORM\DBConf;
+use NC\orm\conf\DBConf;
 use PhpLib\interfaces\routing\{
     Router as RouterInterface,
     Context as ContextInterface
@@ -13,6 +12,8 @@ use PhpLib\interfaces\routing\{
 use PhpLib\injection\InjectionContainer;
 use PhpLib\routing\Context;
 
+use NC\helpers\ModelContainer;
+use NC\models\User as UserModel;
 use NC\routing\Router;
 use NC\controllers\{
 	api\Home,
@@ -21,14 +22,7 @@ use NC\controllers\{
 	errors\InternalError
 };
 
-define('__ROOT__', dirname(__DIR__));
-
-(new DBConf())->use(
-	engine: 'mysql',
-	host: 'db-host',
-	dbname: 'db-name',
-	username: 'root', password: 'root'
-);
+DBConf::useConf(__DIR__ . '/../db-conf.json');
 
 (new ModelContainer())
 	->use(UserModel::class)

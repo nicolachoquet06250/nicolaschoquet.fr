@@ -25,6 +25,14 @@ class Route extends RouteBase {
 	public function resolve(): array|string|null {
 		$result = parent::resolve();
 
+		if (
+			is_array($result)
+			&& count($result) === 1
+			&& is_integer(array_keys($result)[0])
+		) {
+			$result = $result[array_keys($result)[0]];
+		}
+
 		if ($this->isJson()) {
 			if (is_array($result) || is_object($result)) {
 				header('Content-Type: application/json;charset=utf-8');

@@ -3,6 +3,7 @@
 namespace NC\routing;
 
 use Exception;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use NC\decorators\Json;
@@ -23,12 +24,54 @@ class Router extends ParentRouter {
 			$_SERVER['REQUEST_URI'] = $_GET['q'];
 		}
 
-		/** @var Route $result */
-		$result = parent::resolve();
-		if (is_null($result)) {
-			return null;
+		$currentUri = $_SERVER['REQUEST_URI'];
+		[$currentUri] = explode('?', $currentUri);
+		$currentHttpMethod = strtolower($_SERVER['REQUEST_METHOD']);
+
+		$expectedHttpMethod = null;
+		$givenHttpMethod = null;
+
+		if (isset($this->routes()[$currentHttpMethod])) {
+			$route =  array_reduce(
+				array_values($this->routes()[$currentHttpMethod]),
+				static fn (?Route $r, Route $c) => $c->match() ? $c : $r,
+				null
+			);
+
+			if (!is_null($route)) {
+				return $route;
+			}
 		}
-		return $result;
+
+		$matches = 0;
+		foreach ($this->routes() as $httpMethod => $_route) {
+			if ($httpMethod !== $currentHttpMethod) {
+				$match = array_reduce(
+					array_values($this->routes()[$httpMethod]),
+					static fn(Route|bool $r, Route $c) => $c->match() ? true : $r,
+					false
+				);
+
+				if ($match) {
+					$expectedHttpMethod = $httpMethod;
+					$givenHttpMethod = $currentHttpMethod;
+
+					$matches++;
+				}
+			}
+		}
+
+		if ($matches > 0) {
+			throw new BadMethodException("uri $currentUri expected $expectedHttpMethod http method, $givenHttpMethod given", 400);
+		}
+		throw new NotFoundException("page $currentUri not found", 404);
+	}
+
+	/**
+	 * @return array<ErrorRoute>
+	 */
+	public function errors(): array {
+		return static::$errorRoutes;
 	}
 
 	/**
@@ -96,6 +139,36 @@ class Router extends ParentRouter {
 		foreach ($this->routesProvider['routes'] as $route) {
 			$this->resolveRoute($route, RouteAttribute::class);
 		}
+	}
+
+	protected function resolveError(string $errorName, string $message, int $code, array $stackTrace): ?ErrorRoute {
+		$errorResolved = parent::resolveError($errorName, $message, $code, $stackTrace);
+
+		[$target, $method,] = [
+			$errorResolved->getTarget(),
+			$errorResolved->getMethod()
+		];
+
+		$rc = new ReflectionClass($target);
+
+		$attrs = $rc->getAttributes(Json::class, ReflectionAttribute::IS_INSTANCEOF);
+		if (!empty($attrs)) {
+			/** @var Attribute $attr */
+			$attr = $attrs[0]->newInstance();
+			$attr->setTarget($target);
+			$attr->setMethod($method);
+			$attr->process();
+		}
+
+		/** @var ErrorRoute $errorResolved */
+		$errorResolved = parent::resolveError($errorName, $message, $code, $stackTrace);
+		return $errorResolved;
+	}
+
+
+	public static function error(string $errorType, string $target, string $method): ErrorRoute {
+		static::$errorRoutes[$errorType] = new ErrorRoute($errorType, $target, $method);
+		return static::$errorRoutes[$errorType];
 	}
 
 	public function run(): void {
