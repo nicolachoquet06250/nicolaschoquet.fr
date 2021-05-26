@@ -4,7 +4,6 @@ error_reporting(E_ALL);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use NC\orm\conf\DBConf;
 use PhpLib\interfaces\routing\{
     Router as RouterInterface,
     Context as ContextInterface
@@ -12,11 +11,20 @@ use PhpLib\interfaces\routing\{
 use PhpLib\injection\InjectionContainer;
 use PhpLib\routing\Context;
 
+use NC\interfaces\Request as RequestInterface;
+use NC\orm\conf\DBConf;
 use NC\helpers\ModelContainer;
-use NC\models\User as UserModel;
-use NC\routing\Router;
+use NC\routing\{
+	Request,
+	Router
+};
+use NC\models\{
+	User as UserModel,
+	Project as ProjectModel,
+};
 use NC\controllers\{
-	api\Home,
+	api\User as UserController,
+	api\Project as ProjectController,
 	errors\NotFound,
 	errors\BadRequest,
 	errors\InternalError
@@ -26,14 +34,17 @@ DBConf::useConf(__DIR__ . '/../db-conf.json');
 
 (new ModelContainer())
 	->use(UserModel::class)
+	->use(ProjectModel::class)
 	->initializeTables();
 
 (new InjectionContainer())
     ->use(RouterInterface::class, Router::class)
     ->use(ContextInterface::class, Context::class)
-	->use( UserModel::class, static fn() => new UserModel());
+    ->use( RequestInterface::class, Request::class)
+	->use( UserModel::class, static fn() => new UserModel())
+	->use( ProjectModel::class, static fn() => new ProjectModel());
 
 (new Router())->use([
-    'routes' => [ Home::class ],
+    'routes' => [ UserController::class, ProjectController::class ],
     'errors' => [ NotFound::class, BadRequest::class, InternalError::class ]
 ])->run();

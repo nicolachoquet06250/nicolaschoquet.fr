@@ -3,6 +3,7 @@
 namespace NC\routing;
 
 use Exception;
+use NC\decorators\ErrorJson;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
@@ -145,13 +146,13 @@ class Router extends ParentRouter {
 		$errorResolved = parent::resolveError($errorName, $message, $code, $stackTrace);
 
 		[$target, $method,] = [
-			$errorResolved->getTarget(),
-			$errorResolved->getMethod()
+			$errorResolved?->getTarget(),
+			$errorResolved?->getMethod()
 		];
 
 		$rc = new ReflectionClass($target);
 
-		$attrs = $rc->getAttributes(Json::class, ReflectionAttribute::IS_INSTANCEOF);
+		$attrs = $rc->getAttributes(ErrorJson::class);
 		if (!empty($attrs)) {
 			/** @var Attribute $attr */
 			$attr = $attrs[0]->newInstance();

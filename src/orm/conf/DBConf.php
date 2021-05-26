@@ -35,7 +35,8 @@ class DBConf extends DBConfBase {
 				host: $host,
 				dbname: $dbname,
 				username: $username,
-				password: $password
+				password: $password,
+				saveName: $confName
 			);
 		}
 	}

@@ -8,36 +8,26 @@ use PhpLib\{
 	ORM\Model,
 	routing\exceptions\NotFoundException
 };
-use NC\decorators\Json;
-use NC\models\User;
-use NC\routing\Route;
+use NC\{
+	decorators\Json,
+	models\User as UserModel,
+	routing\Route
+};
 
-#[
-	RouteAttribute('/'),
-	RouteAttribute('/api/home')
-]
-class Home {
+#[RouteAttribute('/api/user')]
+class User {
 	use Injector;
 
 	public function __construct(
-		private User $user
+		private UserModel $user
 	) {}
 
 	#[
 		Json,
 		RouteAttribute(
-			uri: '/{id}',
+			uri: '/api/user/{id}',
 			httpMethod: Route::GET,
-			params: [
-				'id' => Route::NUMBER
-			]
-		),
-		RouteAttribute(
-			uri: '/api/home/{id}',
-			httpMethod: Route::GET,
-			params: [
-				'id' => Route::NUMBER
-			]
+			params: [ 'id' => Route::NUMBER ]
 		)
 	]
 	public function get(?int $id = null): Model|array {
@@ -45,9 +35,9 @@ class Home {
 		if (is_null($id)) {
 			return $request->get();
 		}
-		$request = $request->where('id', $id);
+		$request->where('id', $id);
 		if ($request->count() === 0) {
-			throw new NotFoundException("user $id not exists", 404);
+			throw new NotFoundException("user width id $id not exists", 404);
 		}
 		return $request->get();
 	}
