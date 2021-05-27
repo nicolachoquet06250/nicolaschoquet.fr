@@ -26,7 +26,11 @@ class Project {
 
 	#[Json]
 	public function get(): array {
-		return $this->project->select()->get();
+		$projects = $this->project->select();
+		if ($projects->count() === 1) {
+			return [ $projects->get() ];
+		}
+		return $projects->get();
 	}
 
 	#[

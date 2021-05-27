@@ -18,10 +18,7 @@ use NC\routing\{
 	Request,
 	Router
 };
-use NC\models\{
-	User as UserModel,
-	Project as ProjectModel,
-};
+use NC\models\{Comment as CommentModel, User as UserModel, Project as ProjectModel};
 use NC\controllers\{
 	api\User as UserController,
 	api\Project as ProjectController,
@@ -35,6 +32,7 @@ DBConf::useConf(__DIR__ . '/../db-conf.json');
 (new ModelContainer())
 	->use(UserModel::class)
 	->use(ProjectModel::class)
+	->use( CommentModel::class)
 	->initializeTables();
 
 (new InjectionContainer())
@@ -42,7 +40,8 @@ DBConf::useConf(__DIR__ . '/../db-conf.json');
     ->use(ContextInterface::class, Context::class)
     ->use( RequestInterface::class, Request::class)
 	->use( UserModel::class, static fn() => new UserModel())
-	->use( ProjectModel::class, static fn() => new ProjectModel());
+	->use( ProjectModel::class, static fn() => new ProjectModel())
+	->use( CommentModel::class, static fn() => new CommentModel());
 
 (new Router())->use([
     'routes' => [ UserController::class, ProjectController::class ],
