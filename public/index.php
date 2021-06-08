@@ -19,13 +19,12 @@ use NC\routing\{
 	Router
 };
 use NC\models\{Comment as CommentModel, User as UserModel, Project as ProjectModel};
-use NC\controllers\{
-	api\User as UserController,
-	api\Project as ProjectController,
-	errors\NotFound,
-	errors\BadRequest,
-	errors\InternalError
-};
+use NC\controllers\{api\User as UserController,
+    api\Project as ProjectController,
+    errors\NotFound,
+    errors\BadRequest,
+    errors\InternalError,
+    front\Accordion as AccordionController};
 
 DBConf::useConf(__DIR__ . '/../db-conf.json');
 
@@ -44,6 +43,6 @@ DBConf::useConf(__DIR__ . '/../db-conf.json');
 	->use( CommentModel::class, static fn() => new CommentModel());
 
 (new Router())->use([
-    'routes' => [ UserController::class, ProjectController::class ],
+    'routes' => [ UserController::class, ProjectController::class, AccordionController::class ],
     'errors' => [ NotFound::class, BadRequest::class, InternalError::class ]
 ])->run();

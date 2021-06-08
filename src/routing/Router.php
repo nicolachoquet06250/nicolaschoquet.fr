@@ -20,10 +20,32 @@ use PhpLib\routing\{
 };
 
 class Router extends ParentRouter {
+    private function generateUpToDateMimeArray(string $url = APACHE_MIME_TYPES_URL): array {
+        $s = array();
+
+        foreach(explode("\n", @file_get_contents($url)) as $x)
+            if(isset($x[0]) && $x[0] !== '#' && preg_match_all('#([^\s]+)#', $x,$out) && isset($out[1]) && ($c = count($out[1])) > 1)
+                for($i = 1; $i < $c; $i++)
+                    $s[$out[1][$i]] = $out[1][0];
+
+        return $s;
+    }
+
+    public function mime_content_type(string $filename) {
+        return $this->generateUpToDateMimeArray()[explode('.', $filename)[1]];
+    }
+
 	protected function resolve(): ?Route {
 		if (isset($_GET['q'])) {
 			$_SERVER['REQUEST_URI'] = $_GET['q'];
 		}
+
+		define('APACHE_MIME_TYPES_URL','http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types');
+
+        if (strstr($_SERVER['REQUEST_URI'], '.')) {
+		    header("Content-Type: " . $this->mime_content_type($_SERVER['REQUEST_URI']));
+		    exit(file_get_contents(__DIR__ . '/../../public' . $_SERVER['REQUEST_URI']));
+        }
 
 		$currentUri = $_SERVER['REQUEST_URI'];
 		[$currentUri] = explode('?', $currentUri);

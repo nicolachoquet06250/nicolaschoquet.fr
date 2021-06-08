@@ -3,10 +3,12 @@
 
 namespace NC\controllers\api;
 
-use PhpLib\{decorators\Route as RouteAttribute,
+use PhpLib\{
+    decorators\Route as RouteAttribute,
 	injection\Injector,
 	routing\exceptions\BadMethodException,
-	routing\exceptions\NotFoundException};
+	routing\exceptions\NotFoundException
+};
 use NC\{
 	decorators\Json,
 	interfaces\Request,
