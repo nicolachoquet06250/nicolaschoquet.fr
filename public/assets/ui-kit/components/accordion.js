@@ -8,62 +8,7 @@ class Accordion extends Component {
     get componentTemplate() {
         return `
         <ul class="accordion" id="simple-accordion">
-            <li class="accordion-item">
-                  <label for="accordion-item-internet-${this.name}" class="accordion-item-header">
-                      <input type="${this.inputType}" id="accordion-item-internet-${this.name}" name="${this.name}">
-            
-                      <label for="accordion-item-internet-${this.name}">Internet</label>
-            
-                      <span class="accordion-item-header-icon"></span>
-                  </label>
-            
-                  <div class="accordion-item-body">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                  </div>
-            </li>
-        
-            <li class="accordion-item">
-                  <label for="accordion-item-tv-${this.name}" class="accordion-item-header">
-                      <input type="${this.inputType}" id="accordion-item-tv-${this.name}" name="${this.name}">
-            
-                      <label for="accordion-item-tv-${this.name}">TV d'Orange</label>
-            
-                      <span class="accordion-item-header-icon"></span>
-                  </label>
-            
-                  <div class="accordion-item-body">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                  </div>
-            </li>
-        
-            <li class="accordion-item">
-                  <label for="accordion-item-aucun-service-${this.name}" class="accordion-item-header">
-                      <input type="${this.inputType}" id="accordion-item-aucun-service-${this.name}" name="${this.name}">
-            
-                      <label for="accordion-item-aucun-service-${this.name}">Aucun Service</label>
-            
-                      <span class="accordion-item-header-icon"></span>
-                  </label>
-            
-                  <div class="accordion-item-body">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad amet assumenda dolore, et explicabo facere harum magnam <br>
-                          maxime nemo non quam quia repudiandae, similique unde, veritatis. Distinctio nisi nobis ullam.</p>
-                  </div>
-             </li>
+             <slot></slot>
         </ul>
         `;
     }
@@ -141,13 +86,42 @@ class Accordion extends Component {
         this.setAttribute('name', name);
     }
 
+    constructor() {
+        super();
+        this.inputs = [];
+    }
+
     onChange(e) {
         const target = e.target;
         const body = target.parentElement.nextElementSibling;
 
-        Array.from(this.root.querySelectorAll(`${this.cssComponentId} input[type="${this.inputType}"]`)).map(i => {
-            if (!i.checked && i.parentElement.nextElementSibling.classList.contains('show')) {
-                i.parentElement.nextElementSibling.classList.remove('show');
+        this.inputs.map(input => {
+            if (this.inputType === 'radio' && input.getAttribute('id') !== target.getAttribute('id') && input.checked) {
+                input.checked = false;
+                input.parentElement.nextElementSibling.classList.remove('show');
+            }
+
+            if (input.getAttribute('id') === target.getAttribute('id')) {
+                let checked;
+                if (this.inputType === 'radio') {
+                    checked = input.getAttribute('value');
+                } else {
+                    checked = [];
+                    this.inputs.reduce((r, c) => {
+                        if (c.checked) {
+                            r.push(c.getAttribute('value'));
+                        }
+                        return r;
+                    }, []).map(e => checked.push(e));
+                }
+
+                this.dispatchEvent(new CustomEvent('change', {
+                    detail: {
+                        target: input,
+                        value: input.getAttribute('value'),
+                        checked
+                    }
+                }))
             }
         })
 
@@ -155,11 +129,8 @@ class Accordion extends Component {
     }
 
     connectedCallback() {
-        Array.from(this.root.querySelectorAll(`${this.cssComponentId} input[type="${this.inputType}"]`))
-            .map(i => i.addEventListener('change', this.onChange.bind(this)));
-
-        Array.from(this.root.querySelectorAll(`${this.cssComponentId} input[type="${this.inputType}"]`))
-            .map(i => i.parentElement.nextElementSibling.classList[i.checked ? 'add' : 'remove']('show'));
+        this.inputs.map(i => i.addEventListener('change', this.onChange.bind(this)));
+        this.inputs.map(i => i.parentElement.nextElementSibling.classList[i.checked ? 'add' : 'remove']('show'));
     }
 }
 
@@ -171,6 +142,19 @@ export class SimpleAccordion extends Accordion {
     get inputType() {
         return 'radio';
     }
+
+    connectedCallback() {
+        const items = Array.from(this.querySelectorAll('accordion-item'));
+        let cmp = 0;
+
+        items.map(el => el.addEventListener('load', () => {
+            this.inputs.push(el.root.querySelector(`input[type="${this.inputType}"]`));
+            cmp++;
+            if (cmp === items.length) {
+                super.connectedCallback();
+            }
+        }));
+    }
 }
 
 export class MultiAccordion extends Accordion {
@@ -180,5 +164,125 @@ export class MultiAccordion extends Accordion {
 
     get inputType() {
         return 'checkbox';
+    }
+
+    connectedCallback() {
+        const items = Array.from(this.querySelectorAll('accordion-item'));
+        let cmp = 0;
+
+        items.map(el => el.addEventListener('load', () => {
+            this.inputs.push(el.root.querySelector(`input[type="${this.inputType}"]`));
+
+            cmp++;
+            if (cmp === items.length) {
+                super.connectedCallback();
+            }
+        }));
+    }
+}
+
+export class AccordionItem extends Component {
+    get useShadow() {
+        return true;
+    }
+
+    static get selector() {
+        return 'accordion-item';
+    }
+
+    get id() {
+        return this.getAttribute('id');
+    }
+
+    get value() {
+        return this.getAttribute('value');
+    }
+
+    set value(value) {
+        this.setAttribute('value', value);
+    }
+
+    get componentTemplate() {
+        return `
+        <li class="accordion-item">
+              <label for="${this.id}-${this.parentElement.name}" class="accordion-item-header">
+                  <input type="${this.parentElement.inputType}" id="${this.id}-${this.parentElement.name}" name="${this.parentElement.name}" value="${this.value}">
+        
+                  <label for="${this.id}-${this.parentElement.name}">
+                        <slot name="title"></slot>
+                  </label>
+        
+                  <span class="accordion-item-header-icon"></span>
+              </label>
+        
+              <div class="accordion-item-body">
+                  <slot name="content"></slot>
+              </div>
+        </li>
+        `;
+    }
+
+    get componentStyle() {
+        return `
+        <style>
+            ${this.cssComponentId} * {
+                font-family: sans-serif;
+            }
+    
+            ${this.cssComponentId} .accordion-item {
+                margin-top: 5px;
+                margin-bottom: 5px;
+                min-height: 50px;
+                border-bottom: 1px solid black;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-header {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-header input[type="${this.parentElement.inputType}"] {
+                display: none;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-header label {
+                font-size: 2rem;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-header input[type="${this.parentElement.inputType}"] + label + .accordion-item-header-icon::after {
+                content: '<';
+                font-size: 2rem;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-header input[type="${this.parentElement.inputType}"] + label + .accordion-item-header-icon {
+                transform: rotate(-90deg);
+                transition: transform .2s linear;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-header input[type="${this.parentElement.inputType}"]:checked + label + .accordion-item-header-icon {
+                transform: rotate(90deg);
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-header input[type="${this.parentElement.inputType}"]:checked + label,
+            ${this.cssComponentId} .accordion-item .accordion-item-header input[type="${this.parentElement.inputType}"]:checked + label + .accordion-item-header-icon {
+                color: #FD6902FF;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-body {
+                display: none;
+            }
+    
+            ${this.cssComponentId} .accordion-item .accordion-item-body.show {
+                display: block;
+            }
+        </style>
+        `;
+    }
+
+    connectedCallback() {
+        this.dispatchEvent(new Event('load'))
     }
 }

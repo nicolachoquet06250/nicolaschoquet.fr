@@ -3,7 +3,7 @@ import { Switch } from './switch.js';
 import { Input } from './input.js';
 import { Select, Option } from './select.js';
 import { Image } from './image.js';
-import { SimpleAccordion, MultiAccordion } from "./accordion.js";
+import { SimpleAccordion, MultiAccordion, AccordionItem } from "./accordion.js";
 
 
 Button.create();
@@ -14,3 +14,4 @@ Option.create();
 Image.create();
 SimpleAccordion.create();
 MultiAccordion.create();
+AccordionItem.create();

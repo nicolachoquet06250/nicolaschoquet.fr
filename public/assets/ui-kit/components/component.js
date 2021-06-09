@@ -56,7 +56,7 @@ export class Component extends HTMLElement {
         this.setAttribute('data-component_id', this.uniqId);
 
         if (this.useShadow) {
-            this.shadow = this.attachShadow({ mode: 'closed' });
+            this.shadow = this.attachShadow({ mode: 'open' });
         }
 
         this.render();
