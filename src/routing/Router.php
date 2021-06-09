@@ -43,8 +43,12 @@ class Router extends ParentRouter {
 		define('APACHE_MIME_TYPES_URL','http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types');
 
         if (strstr($_SERVER['REQUEST_URI'], '.')) {
-		    header("Content-Type: " . $this->mime_content_type($_SERVER['REQUEST_URI']));
-		    exit(file_get_contents(__DIR__ . '/../../public' . $_SERVER['REQUEST_URI']));
+		    if (file_exists(__DIR__ . '/../../public' . $_SERVER['REQUEST_URI'])) {
+                header("Content-Type: " . $this->mime_content_type($_SERVER['REQUEST_URI']));
+		        exit(file_get_contents(__DIR__ . '/../../public' . $_SERVER['REQUEST_URI']));
+            } else {
+                throw new NotFoundException('file '. __DIR__ . '/../../public' . $_SERVER['REQUEST_URI'] . ' not found', 404);
+            }
         }
 
 		$currentUri = $_SERVER['REQUEST_URI'];

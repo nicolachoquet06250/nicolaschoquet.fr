@@ -16,6 +16,10 @@ class Accordion extends Component {
     get componentStyle() {
         return `
             <style>
+            ${this.cssComponentId} {
+                width: 100%;
+            }
+            
             ${this.cssComponentId} * {
                 font-family: sans-serif;
             }

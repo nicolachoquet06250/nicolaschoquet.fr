@@ -24,7 +24,7 @@ use NC\controllers\{api\User as UserController,
     errors\NotFound,
     errors\BadRequest,
     errors\InternalError,
-    front\Accordion as AccordionController};
+    front\DocLayout as DocLayoutController};
 
 DBConf::useConf(__DIR__ . '/../db-conf.json');
 
@@ -43,6 +43,6 @@ DBConf::useConf(__DIR__ . '/../db-conf.json');
 	->use( CommentModel::class, static fn() => new CommentModel());
 
 (new Router())->use([
-    'routes' => [ UserController::class, ProjectController::class, AccordionController::class ],
+    'routes' => [ UserController::class, ProjectController::class, DocLayoutController::class ],
     'errors' => [ NotFound::class, BadRequest::class, InternalError::class ]
 ])->run();
