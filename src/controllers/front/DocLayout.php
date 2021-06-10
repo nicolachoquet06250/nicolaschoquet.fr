@@ -9,8 +9,6 @@ use PhpLib\decorators\Route;
 class DocLayout
 {
     protected function getTabs(string $selected): string {
-        $isActive = fn($expected) => $selected === $expected ? 'active' : '';
-
         return <<<HTML
             <tabs-container active-tab="$selected">
                 <tab-items>
