@@ -1,4 +1,5 @@
-import {Component} from "./component.js";
+import { Component } from "./component.js";
+
 
 class Accordion extends Component {
     get useShadow() {

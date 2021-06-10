@@ -4,14 +4,11 @@ import { Input } from './input.js';
 import { Select, Option } from './select.js';
 import { Image } from './image.js';
 import { SimpleAccordion, MultiAccordion, AccordionItem } from "./accordion.js";
+import { TabsContainer, TabItem, TabContent, TabItems } from './tabs.js';
 
-
-Button.create();
-Switch.create();
-Input.create();
-Select.create();
-Option.create();
-Image.create();
-SimpleAccordion.create();
-MultiAccordion.create();
-AccordionItem.create();
+[
+    Button, Switch, Input, Select, Option,
+    Image,
+    SimpleAccordion, MultiAccordion, AccordionItem,
+    TabsContainer, TabItem, TabContent, TabItems
+].map(component => component.create());

@@ -8,102 +8,45 @@ use PhpLib\decorators\Route;
 #[Route('/doc')]
 class DocLayout
 {
-    protected function getTabs(string $selected) {
-        $isActive = fn($expected) => match ($expected) {
-            default => $selected === $expected ? 'active' : ''
-        };
+    protected function getTabs(string $selected): string {
+        $isActive = fn($expected) => $selected === $expected ? 'active' : '';
 
         return <<<HTML
-            <style>
-                .tabs ul {
-                    list-style: none;
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-around;
-                    align-items: center;
-                    padding-left: 0;
-                    border-bottom: 1px solid black;
-                }
+            <tabs-container active-tab="$selected">
+                <tab-items>
+                    <tab-item active="false" title="Boutons" item="buttons">
+                        Bouton
+                    </tab-item>
+                    
+                    <tab-item active="false" title="Images" item="images">
+                        Image
+                    </tab-item>
+                    
+                    <tab-item active="false" title="Forms" item="forms">
+                        Form
+                    </tab-item>
+                    
+                    <tab-item active="false" title="Accordéons" item="accordions">
+                        Accordéon
+                    </tab-item>
+                </tab-items>
                 
-                .tabs ul li {
-                    display: flex;
-                    width: 100%;
-                    height: 50px;
-                    justify-content: center;
-                    align-items: center;
-                }
+                <tab-content active="false" slot="content" item="buttons"> 
+                    {$this->getButton()} 
+                </tab-content>
                 
-                .tabs ul li a {
-                    color: black;
-                    text-decoration: none;
-                    cursor: pointer;
-                    font-size: 1.5rem;
-                }
+                <tab-content active="false" slot="content" item="images"> 
+                    {$this->getImage()} 
+                </tab-content>
                 
-                .tabs ul li.active {
-                    border-bottom: 2px solid black;
-                }
+                <tab-content active="false" slot="content" item="forms"> 
+                    {$this->getForm()} 
+                </tab-content>
                 
-                .tab-content {
-                    display: none;
-                }
-                
-                .tab-content.active {
-                    display: block;
-                }
-            </style>
-            
-            <nav class="tabs">
-                <ul>
-                    <li class="{$isActive('button')}"> 
-                        <a href="#tab-content-button" data-title="Boutons"> Bouton </a>
-                    </li>
-                    <li class="{$isActive('image')}"> 
-                        <a href="#tab-content-image" data-title="Images"> Image </a>
-                    </li>
-                    <li class="{$isActive('form')}">
-                        <a href="#tab-content-form" data-title="Forms"> Form </a>
-                    </li>
-                    <li class="{$isActive('accordion')}">
-                        <a href="#tab-content-accordion" data-title="Accordéons"> Accordéon </a>
-                    </li>
-                </ul>
-            </nav>
-            
-            <div id="tab-content-button" class="tab-content {$isActive('button')}">
-                {$this->getButton()}
-            </div>
-            <div id="tab-content-image" class="tab-content {$isActive('image')}">
-                {$this->getImage()}
-            </div>
-            <div id="tab-content-form" class="tab-content {$isActive('form')}">
-                {$this->getForm()}
-            </div>
-            <div id="tab-content-accordion" class="tab-content {$isActive('accordion')}">
-                {$this->getAccordion()}
-            </div>
-            
-            <script>
-                window.addEventListener('load', () => {
-                    Array.from(document.querySelectorAll('.tabs ul li a')).map(el => {
-                        el.addEventListener('click', e => {
-                            e.preventDefault();
-                            
-                            const active = document.querySelector('.tabs ul li.active');
-                            const activeContent = document.querySelector('.tab-content.active');
-                            const dist = e.target.getAttribute('href');
-                            const title = e.target.getAttribute('data-title');
-                            
-                            e.target.parentElement.classList.add('active');
-                            document.querySelector(dist).classList.add('active');
-                            activeContent.classList.remove('active');
-                            active.classList.remove('active');
-                            
-                            document.querySelector('title').innerText = 'Documentation | ' + title;
-                        })
-                    })
-                })
-            </script>
+                <tab-content active="false" slot="content" item="accordions"> 
+                    {$this->getAccordion()} 
+                </tab-content>
+            </tabs-container>
         HTML;
     }
 
@@ -124,7 +67,13 @@ class DocLayout
                 <script type="module" src="/assets/ui-kit/components/index.js"></script>
             </head>
             <body>
-                {$this->getTabs('button')}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            {$this->getTabs('buttons')}
+                        </div>
+                    </div>
+                </div>
             </body>
             </html>
         HTML;
@@ -210,7 +159,7 @@ class DocLayout
     public function getButton(): string {
         return <<<HTML
             <style>
-                #tab-content-button .container .row .col-12 {
+                tab-content[item="buttons"] .container .row .col-12 {
                     display: flex;
                     justify-content: center;
                     align-items: center;
@@ -219,13 +168,13 @@ class DocLayout
             
             <div class="container">
                 <div class="row">
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-6 d-flex flex-row justify-content-center align-items-center">
                         <k-button type="classic" primary="false" secondary="true" size="big">
                             Créer votre compte
                         </k-button>
                     </div>
                     
-                    <div class="col-12 col-md-6">
+                    <div class="col-12 col-md-6 d-flex flex-row justify-content-center align-items-center">
                         <k-button type="classic" primary="true" secondary="false" size="big">
                             Créer votre compte
                         </k-button>
@@ -239,8 +188,8 @@ class DocLayout
     public function getForm(): string {
         return <<<HTML
         <style>
-            #tab-content-form .container .row:nth-child(2) .col-6,
-            #tab-content-form .container .row:first-child .col-12 {
+            tab-content[item="forms"] .container .row:nth-child(2) .col-6,
+            tab-content[item="forms"] .container .row:first-child .col-12 {
                 height: 50px;
                 font-size: 2rem;
             }

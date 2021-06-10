@@ -1,5 +1,6 @@
 import { Component } from "./component.js";
 
+
 export class Button extends Component {
     static get selector() {
         return 'k-button';
