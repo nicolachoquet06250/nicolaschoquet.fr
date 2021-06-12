@@ -10,6 +10,20 @@ use PhpLib\routing\Route as RouteBase;
 class Route extends RouteBase {
 	private bool $isJson = false;
 
+    public function getUri($withRegex = true): string {
+        $uri = $this->uri;
+        $uri = str_replace('//', '/', $uri);
+        if ($withRegex) {
+            foreach ($this->params as $param => $regex) {
+                $uri = str_replace("{{$param}}", str_replace('([', "(?<$param>[", $regex), $uri);
+            }
+            $uri = str_replace('\\', '\\\\', $uri);
+            $uri = str_replace('/', '\/', $uri);
+            $uri = "/$uri\$/D";
+        }
+        return $uri;
+    }
+
 	public function isJson(?bool $isJson = null): ?bool {
 		if (is_null($isJson)) {
 			return $this->isJson;

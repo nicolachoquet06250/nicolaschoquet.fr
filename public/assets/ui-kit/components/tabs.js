@@ -50,7 +50,7 @@ export class TabsContainer extends Component {
 
         const elements = items.map(i => [i.active, i.item]);
 
-        Array.from(this.querySelectorAll('tab-content')).map(i => {
+        Array.from(document.querySelectorAll(TabsContainer.selector + '[data-component_id="' + this.uniqId + '"] > tab-content')).map(i => {
             i.active = i.item === this.activeTab
             return i;
         });
@@ -63,6 +63,13 @@ export class TabsContainer extends Component {
                 }
             }
         })
+
+        this.dispatchEvent(new CustomEvent('change', {
+            detail: {
+                tab: this.activeTab,
+                title: this.querySelector('tab-items > tab-item[item="' + this.activeTab + '"]').title
+            }
+        }))
     }
 
     connectedCallback() {
@@ -78,7 +85,7 @@ export class TabsContainer extends Component {
 
             const elements = items.map(i => [i.active, i.item]);
 
-            Array.from(this.querySelectorAll('tab-content')).map(i => {
+            Array.from(document.querySelectorAll(TabsContainer.selector + '[data-component_id="' + this.uniqId + '"] > tab-content')).map(i => {
                 i.active = i.item === this.activeTab
                 return i;
             });

@@ -26,23 +26,30 @@ use NC\controllers\{api\User as UserController,
     errors\InternalError,
     front\DocLayout as DocLayoutController};
 
-DBConf::useConf(__DIR__ . '/../db-conf.json');
+try {
+    DBConf::useConf(__DIR__ . '/../db-conf.json');
 
-(new ModelContainer())
-	->use(UserModel::class)
-	->use(ProjectModel::class)
-	->use( CommentModel::class)
-	->initializeTables();
+    (new ModelContainer())
+        ->use(UserModel::class)
+        ->use(ProjectModel::class)
+        ->use( CommentModel::class)
+        ->initializeTables();
 
-(new InjectionContainer())
-    ->use(RouterInterface::class, Router::class)
-    ->use(ContextInterface::class, Context::class)
-    ->use( RequestInterface::class, Request::class)
-	->use( UserModel::class, static fn() => new UserModel())
-	->use( ProjectModel::class, static fn() => new ProjectModel())
-	->use( CommentModel::class, static fn() => new CommentModel());
+    (new InjectionContainer())
+        ->use(RouterInterface::class, Router::class)
+        ->use(ContextInterface::class, Context::class)
+        ->use( RequestInterface::class, Request::class)
+        ->use( UserModel::class, static fn() => new UserModel())
+        ->use( ProjectModel::class, static fn() => new ProjectModel())
+        ->use( CommentModel::class, static fn() => new CommentModel());
 
-(new Router())->use([
-    'routes' => [ UserController::class, ProjectController::class, DocLayoutController::class ],
-    'errors' => [ NotFound::class, BadRequest::class, InternalError::class ]
-])->run();
+    (new Router())->use([
+        'routes' => [ UserController::class, ProjectController::class, DocLayoutController::class ],
+        'errors' => [ NotFound::class, BadRequest::class, InternalError::class ]
+    ])->run();
+} catch (TypeError $e) {
+    echo '<pre>';
+    echo $e->getMessage();
+    echo '</pre>';
+}
+

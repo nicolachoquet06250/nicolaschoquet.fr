@@ -3,30 +3,35 @@
 
 namespace NC\controllers\front;
 
-use PhpLib\decorators\Route;
+use JetBrains\PhpStorm\Pure;
+use PhpLib\decorators\Route as RouteAttribute;
+use PhpLib\routing\Route;
 
-#[Route('/doc')]
+#[RouteAttribute('/ui-kit/doc')]
 class DocLayout
 {
+    private array $titles = [
+        'buttons' => 'Buttons',
+        'images' => 'Images',
+        'forms' => 'Forms',
+        'accordions' => 'Accordions',
+        'tabs' => 'Tabs'
+    ];
+
+    #[Pure]
     protected function getTabs(string $selected): string {
         return <<<HTML
-            <tabs-container active-tab="$selected">
+            <tabs-container active-tab="$selected" id="tabs-container">
                 <tab-items>
-                    <tab-item active="false" title="Boutons" item="buttons">
-                        Bouton
-                    </tab-item>
+                    <tab-item active="false" title="{$this->titles['buttons']}" item="buttons"> Bouton </tab-item>
                     
-                    <tab-item active="false" title="Images" item="images">
-                        Image
-                    </tab-item>
+                    <tab-item active="false" title="{$this->titles['images']}" item="images"> Image </tab-item>
                     
-                    <tab-item active="false" title="Forms" item="forms">
-                        Form
-                    </tab-item>
+                    <tab-item active="false" title="{$this->titles['forms']}" item="forms"> Form </tab-item>
                     
-                    <tab-item active="false" title="Accordéons" item="accordions">
-                        Accordéon
-                    </tab-item>
+                    <tab-item active="false" title="{$this->titles['accordions']}" item="accordions"> Accordéon </tab-item>
+                    
+                    <tab-item active="false" title="{$this->titles['tabs']}" item="tabs"> Tabs </tab-item>
                 </tab-items>
                 
                 <tab-content active="false" slot="content" item="buttons"> 
@@ -44,11 +49,20 @@ class DocLayout
                 <tab-content active="false" slot="content" item="accordions"> 
                     {$this->getAccordion()} 
                 </tab-content>
+                
+                <tab-content active="false" slot="content" item="tabs"> 
+                    {$this->getTabsComponent()} 
+                </tab-content>
             </tabs-container>
         HTML;
     }
 
-    public function get(): string {
+    #[RouteAttribute(
+        uri: '/ui-kit/doc/{tab}',
+        httpMethod: Route::GET,
+        params: [ 'tab' => Route::STRING ]
+    )]
+    public function get(?string $tab = null): string {
         return <<<HTML
             <!doctype html>
             <html lang="fr">
@@ -56,7 +70,7 @@ class DocLayout
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
                 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>Documentation | Boutons</title>
+                <title>Documentation | {$this->titles[(is_null($tab) ? 'buttons' : $tab)]}</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" 
                       rel="stylesheet" 
                       integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" 
@@ -67,12 +81,20 @@ class DocLayout
             <body>
                 <div class="container">
                     <div class="row">
-                        <div class="col-12">
-                            {$this->getTabs('buttons')}
+                        <div class="col-12 pt-4">
+                            <h1>Documentation UI-KIT</h1>
+                            {$this->getTabs((is_null($tab) ? 'buttons' : $tab))}
                         </div>
                     </div>
                 </div>
             </body>
+            <script>
+                document.querySelector('#tabs-container').addEventListener('change', e => {
+                    const { tab, title } = e.detail;
+                    document.querySelector('title').innerText = 'Documentation | ' + title;
+                    history.pushState({}, 'doc ui-kit', '/ui-kit/doc/' + tab);
+                })
+            </script>
             </html>
         HTML;
     }
@@ -263,4 +285,76 @@ class DocLayout
         </div>
         HTML;
     }
+
+    public function getTabsComponent(): string {
+        return <<<HTML
+        <div>
+            <tabs-container active-tab="first">
+                <tab-items>
+                    <tab-item active="false" title="First" item="first">
+                        First
+                    </tab-item>
+                    
+                    <tab-item active="false" title="Second" item="second">
+                        Second
+                    </tab-item>
+                    
+                    <tab-item active="false" title="Third" item="third">
+                        Third
+                    </tab-item>
+                    
+                    <tab-item active="false" title="Fourth" item="fourth">
+                        Fourth
+                    </tab-item>
+                </tab-items>
+                
+                <tab-content active="false" slot="content" item="first"> 
+                   <h2>First Content</h2>
+                   <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                        Ducimus enim facilis minima soluta veritatis! Asperiores consectetur culpa, 
+                        deserunt dicta doloribus ducimus iste pariatur sint temporibus voluptatem. 
+                        Deleniti eius eveniet excepturi facere illo odit quisquam soluta voluptas? 
+                        Adipisci, at deleniti labore laudantium libero magni, molestiae natus nulla quod unde vel vitae?
+                   </p> 
+                </tab-content>
+                
+                <tab-content active="false" slot="content" item="second"> 
+                   <h2>Second Content</h2>
+                   <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                        Ducimus enim facilis minima soluta veritatis! Asperiores consectetur culpa, 
+                        deserunt dicta doloribus ducimus iste pariatur sint temporibus voluptatem. 
+                        Deleniti eius eveniet excepturi facere illo odit quisquam soluta voluptas? 
+                        Adipisci, at deleniti labore laudantium libero magni, molestiae natus nulla quod unde vel vitae?
+                   </p> 
+                </tab-content>
+                
+                <tab-content active="false" slot="content" item="third"> 
+                   <h2>Third Content</h2>
+                   <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                        Ducimus enim facilis minima soluta veritatis! Asperiores consectetur culpa, 
+                        deserunt dicta doloribus ducimus iste pariatur sint temporibus voluptatem. 
+                        Deleniti eius eveniet excepturi facere illo odit quisquam soluta voluptas? 
+                        Adipisci, at deleniti labore laudantium libero magni, molestiae natus nulla quod unde vel vitae?
+                   </p> 
+                </tab-content>
+                
+                <tab-content active="false" slot="content" item="fourth"> 
+                   <h2>Fourth Content</h2>
+                   <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                        Ducimus enim facilis minima soluta veritatis! Asperiores consectetur culpa, 
+                        deserunt dicta doloribus ducimus iste pariatur sint temporibus voluptatem. 
+                        Deleniti eius eveniet excepturi facere illo odit quisquam soluta voluptas? 
+                        Adipisci, at deleniti labore laudantium libero magni, molestiae natus nulla quod unde vel vitae?
+                   </p> 
+                </tab-content>
+            </tabs-container>
+        </div>
+        HTML;
+    }
+
+
 }

@@ -199,7 +199,7 @@ class Router extends ParentRouter {
 	}
 
 	public function run(): void {
-		try {
+	    try {
 			$this->processErrors();
 			$this->processRoutes();
 
