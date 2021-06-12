@@ -90,9 +90,11 @@ class DocLayout
             </body>
             <script>
                 document.querySelector('#tabs-container').addEventListener('change', e => {
-                    const { tab, title } = e.detail;
-                    document.querySelector('title').innerText = 'Documentation | ' + title;
-                    history.pushState({}, 'doc ui-kit', '/ui-kit/doc/' + tab);
+                    if (e.detail) {
+                        const { tab, title } = e.detail;
+                        document.querySelector('title').innerText = 'Documentation | ' + title;
+                        history.pushState({}, 'doc ui-kit', '/ui-kit/doc/' + tab);
+                    }
                 })
             </script>
             </html>
@@ -241,7 +243,7 @@ class DocLayout
                 </div>
                 
                 <div class="col-3 pb-1 d-flex flex-row justify-content-center align-items-center">
-                    <k-switch type="radio" name="radio" checked="true" on-icon="assets/ui-kit/components/moon-regular.svg" off-icon="assets/ui-kit/components/sun-regular.svg"></k-switch>
+                    <k-switch type="radio" name="radio" checked="true" on-icon="/assets/ui-kit/components/moon-regular.svg" off-icon="/assets/ui-kit/components/sun-regular.svg"></k-switch>
                 </div>
                 
                 <div class="col-3 pb-1 d-flex flex-row justify-content-center align-items-center">
