@@ -4,11 +4,12 @@
 namespace NC\controllers\front;
 
 use JetBrains\PhpStorm\Pure;
+use NC\controllers\Layout;
 use PhpLib\decorators\Route as RouteAttribute;
 use PhpLib\routing\Route;
 
 #[RouteAttribute('/ui-kit/doc')]
-class DocLayout
+class DocLayout extends Layout
 {
     private array $titles = [
         'buttons' => 'Buttons',
@@ -63,42 +64,31 @@ class DocLayout
         params: [ 'tab' => Route::STRING ]
     )]
     public function get(?string $tab = null): string {
-        return <<<HTML
-            <!doctype html>
-            <html lang="fr">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-                <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <title>Documentation | {$this->titles[(is_null($tab) ? 'buttons' : $tab)]}</title>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" 
-                      rel="stylesheet" 
-                      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" 
-                      crossorigin="anonymous">
-                
-                <script type="module" src="/assets/ui-kit/components/index.js"></script>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12 pt-4">
-                            <h1>Documentation UI-KIT</h1>
-                            {$this->getTabs((is_null($tab) ? 'buttons' : $tab))}
-                        </div>
-                    </div>
-                </div>
-            </body>
-            <script>
-                document.querySelector('#tabs-container').addEventListener('change', e => {
-                    if (e.detail) {
-                        const { tab, title } = e.detail;
-                        document.querySelector('title').innerText = 'Documentation | ' + title;
-                        history.pushState({}, 'doc ui-kit', '/ui-kit/doc/' + tab);
-                    }
-                })
-            </script>
-            </html>
+        $this->title = "Documentation | {$this->titles[(is_null($tab) ? 'buttons' : $tab)]}";
+
+        $this->styles = [
+            'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css'
+        ];
+        $this->startScripts = [
+            'module@/assets/ui-kit/components/index.js'
+        ];
+
+        $this->content = <<<HTML
+        <h1>Documentation UI-KIT</h1>
+        {$this->getTabs((is_null($tab) ? 'buttons' : $tab))}
         HTML;
+
+        $this->jsScript = <<<JS
+            document.querySelector('#tabs-container').addEventListener('change', e => {
+                if (e.detail) {
+                    const { tab, title } = e.detail;
+                    document.querySelector('title').innerText = 'Documentation | ' + title;
+                    history.pushState({}, 'doc ui-kit', '/ui-kit/doc/' + tab);
+                }
+            })
+        JS;
+
+        return $this->layout();
     }
 
     public function getAccordion(): string {

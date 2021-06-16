@@ -24,7 +24,11 @@ use NC\controllers\{api\User as UserController,
     errors\NotFound,
     errors\BadRequest,
     errors\InternalError,
-    front\DocLayout as DocLayoutController};
+    front\DocLayout as DocLayoutController,
+    front\Home as HomeController
+};
+
+define('APACHE_MIME_TYPES_URL', 'http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types');
 
 try {
     DBConf::useConf(__DIR__ . '/../db-conf.json');
@@ -44,12 +48,10 @@ try {
         ->use( CommentModel::class, static fn() => new CommentModel());
 
     (new Router())->use([
-        'routes' => [ UserController::class, ProjectController::class, DocLayoutController::class ],
+        'routes' => [ UserController::class, ProjectController::class, DocLayoutController::class, HomeController::class ],
         'errors' => [ NotFound::class, BadRequest::class, InternalError::class ]
     ])->run();
 } catch (TypeError $e) {
-    echo '<pre>';
-    echo $e->getMessage();
-    echo '</pre>';
+    dump($e->getMessage(), $e->getFile(), $e->getLine(), $e->getTrace());
 }
 
