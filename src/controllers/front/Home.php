@@ -26,9 +26,19 @@ class Home extends Layout
             padding: 0;
             font-family: "HoloLens MDL2 Assets", sans-serif;
         }
+
+        nav + .container {
+            margin-top: 50px;
+        }
         
         nav {
             border-bottom: 2px solid #5e17eb;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 1;
+            background: white;
         }
     
         nav > div {
@@ -97,14 +107,21 @@ class Home extends Layout
         
         .account-card > .profile-picture {
             width: 25px;
-            height: 25px;
             border-radius: 25px;
             border: 2px solid darkgreen;
             margin-left: 5px;
             background-size: cover;
             background-position: center;
             background-color: white;
-            background-image: url(/assets/images/nicolas-choquet-logo.png);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .account-card > .profile-picture > img {
+            width: 100%;
+            height: 100%;
+            border-radius: 25px;
         }
         
         .account-card > .full-name {
@@ -128,6 +145,9 @@ class Home extends Layout
             height: max-content;
             margin-top: 5px;
             position: relative;
+            background: #d8d8d8;
+            padding-bottom: 10px;
+            border-radius: 15px;
         }
         
         .apps-card > .header {
@@ -137,17 +157,8 @@ class Home extends Layout
             position: relative;
             display: flex;
             clip-path: polygon(0 0, 100% 0, 100% 74%, 0% 100%);
-        }
-        
-        .apps-card > .header:after {
-            content: ''; 
-            position: absolute;
-            right: -5px;
-            left: -5px;
-            top: calc(100% - 54px);
-            background: #5e17eb;
-            height: 2px;
-            transform: rotate(-9.7deg);
+            border: 2px solid #5e17eb;
+            border-radius: 15px 15px 0 0;
         }
 
         .apps-card > .header > img {
@@ -158,13 +169,187 @@ class Home extends Layout
             height: 400px;
             width: 100%;
             clip-path: polygon(0 0, 100% 0, 100% 74%, 0% 100%);
+            border-radius: 15px 15px 0 0;
         }
         
         .apps-card > .header + h1 {
-            transform: rotate(-9.7deg);
+            transform: rotate(-16deg);
             position: absolute;
-            right: 0;
-            top: 340px;
+            right: 10px;
+            top: 330px;
+            font-weight: 700;
+        }
+
+        @media screen and (min-width: 992px) {
+            .apps-card > .header + h1 {
+                transform: rotate(-14deg);
+                position: absolute;
+                right: 10px;
+                top: 330px;
+            }
+        }
+
+        @media screen and (min-width: 1200px) {
+            .apps-card > .header + h1 {
+                transform: rotate(-9.7deg);
+                position: absolute;
+                right: 10px;
+                top: 330px;
+            }
+        }
+
+        #norsys-presences-tabs {
+            display: inline-block;
+            margin-top: 20px;
+            margin-left: 30px;
+            margin-right: 30px;
+            width: auto;
+        }
+
+        #norsys-presences-tabs p {
+            padding-left: 10px;
+        }
+
+        .apps-card > .header + h1 + tabs-container + .footer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        .apps-card > .header + h1 + tabs-container + .footer + hr {
+            height: 2px;
+            color: white;
+        }
+
+        .comment-form-bloc {
+            height: 300px;
+            width: auto;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-top: 70px;
+            background: white;
+            position: relative;
+            border-radius: 15px;
+        }
+
+        .comment-form-bloc .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 100px;
+            border: 4px solid green;
+            position: absolute;
+            top: -50px;
+            background: white;
+            left: calc(50% - 50px);
+        }
+
+        .comment-form-bloc .profile-picture img {
+            width: 100%;
+            height: 100%;
+            border-radius: 100px;
+        }
+
+        .comment-form-bloc .input-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: end;
+            top: 80px;
+        }
+
+        .comment-form-bloc .input-group > k-input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .comments {
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-items: start;
+            margin-top: 15px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .comments .comment {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .comments .comment {
+            width: 80%;
+            border: 1px solid white;
+            margin-bottom: 25px;
+        }
+
+        .comments .right-comment .left-bloc,
+        .comments .left-comment .right-bloc {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            padding-left: 10px;
+        }
+
+        .comments .comment .comment-head {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comments .comment .comment-text {
+            margin-top: 10px;
+        }
+
+        .comments .comment .comment-head .poster {
+            margin-right: 10px;
+            font-weight: 700;
+        }
+
+        .comments .comment .profile-picture, 
+        .comments .comment .profile-picture img {
+            max-width: 60px;
+            height: auto;
+        }
+
+        .comments .right-comment {
+            align-self: end;
+        }
+
+        .comments .comment .profile-picture {
+            height: 60px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .comments .right-comment.online {
+            border-left: 4px solid darkgreen;
+        }
+
+        .comments .left-comment.online {
+            border-right: 4px solid darkgreen;
+        }
+
+        .comments .comment.online .profile-picture {
+            border: 2px solid darkgreen;
+        }
+
+        .comments .right-comment.outline {
+            border-left: 4px solid darkred;
+        }
+
+        .comments .left-comment.outline {
+            border-right: 4px solid darkred;
+        }
+
+        .comments .comment.outline .profile-picture {
+            border: 2px solid darkred;
         }
     CSS;
 
@@ -181,7 +366,9 @@ class Home extends Layout
                 </ul>
             </div>
             <div class="account-card">
-                <div class="profile-picture"></div>
+                <div class="profile-picture">
+                    <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E">
+                </div>
                 
                 <span class="full-name">Nicolas C.</span>
                 
@@ -198,31 +385,102 @@ class Home extends Layout
 
 
     protected string $content = <<<HTML
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-6 offset-3">
-                    <div class="apps-card">
-                         <div class="header">
-                            <img src="/assets/images/norsys-presences.png">
-                         </div>
-                        <h1>Norsys Présences</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="apps-card">
+                    <div class="header">
+                        <img src="/assets/images/norsys-presences.png">
+                    </div>
+
+                    <h1>Norsys Présences</h1>
+                    
+                    <tabs-container id="norsys-presences-tabs" active-tab="description">
+                        <tab-items>
+                            <tab-item active="false" title="Description" item="description"> Description </tab-item>
+                        </tab-items>
                         
-                        <tabs-container active-tab="description">
-                            <tab-items>
-                                <tab-item active="false" title="Description" item="description"> Description </tab-item>
-                            </tab-items>
-                            
-                            <tab-content slot="content" item="description">
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
-                                    Accusantium adipisci, animi, culpa cupiditate dicta eius eveniet ex, iusto maxime modi natus necessitatibus nobis obcaecati quaerat qui quia quidem rerum sint soluta vitae. 
-                                    Aut doloremque ducimus esse expedita incidunt minima repellendus sint sit vel velit! Aspernatur doloremque nostrum optio quibusdam sint.
-                                </p>
-                            </tab-content>
-                        </tabs-container>
+                        <tab-content slot="content" item="description">
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                                Accusantium adipisci, animi, culpa cupiditate dicta eius eveniet ex, iusto maxime modi natus necessitatibus nobis obcaecati quaerat qui quia quidem rerum sint soluta vitae. 
+                                Aut doloremque ducimus esse expedita incidunt minima repellendus sint sit vel velit! Aspernatur doloremque nostrum optio quibusdam sint.
+                            </p>
+                        </tab-content>
+                    </tabs-container>
+
+                    <div class="footer">
+                        <a href="#">https://github.com/nicolachoquet06250/norsys-pr...</a>
+                        <span>Créé il y a 2 jours</span>
+                    </div>
+
+                    <hr />
+
+                    <div class="comment-form-bloc">
+                        <div class="profile-picture">
+                            <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E" />
+                        </div>
+                        <div class="input-group">
+                            <k-input type="textarea" value="" placeholder="Saisissez votre commentaire ici ..."></k-input>
+
+                            <k-button type="classic" primary="false" secondary="true" size="big">
+                                Envoyer
+                            </k-button>
+                        </div>
+                    </div>
+
+                    <div class="comments">
+                        <div class="comment right-comment online">
+                            <div class="left-bloc">
+                                <div class="comment-head">
+                                    <span class="date"> Hier </span>
+                                    <div class="poster"> Moi </div>
+                                </div>
+
+                                <div class="comment-text">
+                                    <p>
+                                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi debitis iure amet quidem dolorum omnis dolor. 
+                                        Fugit, optio eveniet ratione eos animi soluta architecto laboriosam aspernatur fuga dolorem placeat eius culpa, 
+                                        reprehenderit laborum rerum tempora maxime, error possimus facilis ut vitae necessitatibus omnis inventore explicabo. 
+                                        Tempora quisquam maiores cupiditate magnam.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="right-bloc">
+                                <div class="profile-picture">
+                                    <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comment left-comment outline">
+                            <div class="left-bloc">
+                                <div class="profile-picture">
+                                    <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/100074061_3340287869337371_1716245584039378944_n.jpg?_nc_cat=104&ccb=1-3&_nc_sid=ad2b24&_nc_ohc=2VpF1gjF59AAX-2ZxfS&_nc_ht=scontent-frt3-1.xx&oh=0a314efbcc62e949a58bd76924d7e66b&oe=60D0686F" />
+                                </div>
+                            </div>
+
+                            <div class="right-bloc">
+                                <div class="comment-head">
+                                    <span class="date"> Il y a 2 jours </span>
+                                    <div class="poster"> Karine A. </div>
+                                </div>
+
+                                <div class="comment-text">
+                                    <p>
+                                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi debitis iure amet quidem dolorum omnis dolor. 
+                                        Fugit, optio eveniet ratione eos animi soluta architecto laboriosam aspernatur fuga dolorem placeat eius culpa, 
+                                        reprehenderit laborum rerum tempora maxime, error possimus facilis ut vitae necessitatibus omnis inventore explicabo. 
+                                        Tempora quisquam maiores cupiditate magnam.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     HTML;
 }
