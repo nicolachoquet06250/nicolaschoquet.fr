@@ -81,4 +81,8 @@ class Layout
             </html>
         HTML;
     }
+
+    public function get(): string {
+        return $this->layout();
+    }
 }

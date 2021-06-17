@@ -16,6 +16,10 @@ class Home extends Layout
         'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css'
     ];
 
+    protected array $startScripts = [
+        'module@/assets/ui-kit/components/index.js'
+    ];
+
     protected string $style = <<<CSS
         body, html {
             margin: 0;
@@ -123,6 +127,7 @@ class Home extends Layout
             width: 100%;
             height: max-content;
             margin-top: 5px;
+            position: relative;
         }
         
         .apps-card > .header {
@@ -157,7 +162,9 @@ class Home extends Layout
         
         .apps-card > .header + h1 {
             transform: rotate(-9.7deg);
-            align-self: end;
+            position: absolute;
+            right: 0;
+            top: 340px;
         }
     CSS;
 
@@ -199,13 +206,23 @@ class Home extends Layout
                             <img src="/assets/images/norsys-presences.png">
                          </div>
                         <h1>Norsys Présences</h1>
+                        
+                        <tabs-container active-tab="description">
+                            <tab-items>
+                                <tab-item active="false" title="Description" item="description"> Description </tab-item>
+                            </tab-items>
+                            
+                            <tab-content slot="content" item="description">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                                    Accusantium adipisci, animi, culpa cupiditate dicta eius eveniet ex, iusto maxime modi natus necessitatibus nobis obcaecati quaerat qui quia quidem rerum sint soluta vitae. 
+                                    Aut doloremque ducimus esse expedita incidunt minima repellendus sint sit vel velit! Aspernatur doloremque nostrum optio quibusdam sint.
+                                </p>
+                            </tab-content>
+                        </tabs-container>
                     </div>
                 </div>
             </div>
         </div>
     HTML;
-
-    public function get(): string {
-        return $this->layout();
-    }
 }
