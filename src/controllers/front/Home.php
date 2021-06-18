@@ -18,7 +18,8 @@ class Home extends Layout
     ];
 
     protected array $startScripts = [
-        'module@/assets/ui-kit/components/index.js'
+        'module@/assets/ui-kit/components/index.js',
+        'module@/assets/components/project.js'
     ];
 
     protected string $menu = <<<HTML
@@ -54,100 +55,44 @@ class Home extends Layout
     protected string $content = <<<HTML
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12 col-lg-8 offset-lg-2">
-                <div class="apps-card">
-                    <div class="header">
-                        <img src="/assets/images/norsys-presences.png">
-                    </div>
+            <div class="col-lg-2 d-flex flex-column justify-content-center align-items-center button-container">
+                <button class="button previous">
+                    <img src="/assets/images/chevron-right-left.svg">
+                </button>
+            </div>
 
-                    <div class="body">
-                        <h1>Norsys Présences</h1>
+            <div class="col-12 col-lg-8" style="position: relative; z-index: 0;">
+                <apps-card user='{"firstname": "Nicolas", "lastname": "Choquet", "picture": "https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E"}'
+                            github-link="https://github.com/nicolachoquet06250/norsys-pr..."
+                            created-at="Créé le 18/06/2021">
+                    <img src="/assets/images/norsys-presences.png" slot="header-img">
+
+                    <h1 slot="body">Norsys Présences</h1>
+                    
+                    <tabs-container id="norsys-presences-tabs" active-tab="description" slot="body">
+                        <tab-items>
+                            <tab-item active="false" title="Description" item="description"> Description </tab-item>
+                        </tab-items>
                         
-                        <tabs-container id="norsys-presences-tabs" active-tab="description">
-                            <tab-items>
-                                <tab-item active="false" title="Description" item="description"> Description </tab-item>
-                            </tab-items>
-                            
-                            <tab-content slot="content" item="description">
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
-                                    Accusantium adipisci, animi, culpa cupiditate dicta eius eveniet ex, iusto maxime modi natus necessitatibus nobis obcaecati quaerat qui quia quidem rerum sint soluta vitae. 
-                                    Aut doloremque ducimus esse expedita incidunt minima repellendus sint sit vel velit! Aspernatur doloremque nostrum optio quibusdam sint.
-                                </p>
-                            </tab-content>
-                        </tabs-container>
+                        <tab-content slot="content" item="description">
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                                Accusantium adipisci, animi, culpa cupiditate dicta eius eveniet ex, iusto maxime modi natus necessitatibus nobis obcaecati quaerat qui quia quidem rerum sint soluta vitae. 
+                                Aut doloremque ducimus esse expedita incidunt minima repellendus sint sit vel velit! Aspernatur doloremque nostrum optio quibusdam sint.
+                            </p>
+                        </tab-content>
+                    </tabs-container>
+                </apps-card>
+            </div>
 
-                        <div class="footer">
-                            <a href="#">https://github.com/nicolachoquet06250/norsys-pr...</a>
-                            <span>Créé il y a 2 jours</span>
-                        </div>
+            <div class="col-lg-2 d-flex flex-column justify-content-center align-items-center button-container">
+                <button class="button next">
+                    <img src="/assets/images/chevron-right-left.svg">
+                </button>
 
-                        <hr />
-
-                        <div class="comment-form-bloc">
-                            <div class="profile-picture">
-                                <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E" />
-                            </div>
-                            <div class="input-group">
-                                <k-input type="textarea" value="" placeholder="Saisissez votre commentaire ici ..."></k-input>
-
-                                <k-button type="classic" primary="false" secondary="true" size="big">
-                                    Envoyer
-                                </k-button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="comments">
-                        <div class="comment right-comment online">
-                            <div class="left-bloc">
-                                <div class="comment-head">
-                                    <span class="date"> Hier </span>
-                                    <div class="poster"> Moi </div>
-                                </div>
-
-                                <div class="comment-text">
-                                    <p>
-                                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi debitis iure amet quidem dolorum omnis dolor. 
-                                        Fugit, optio eveniet ratione eos animi soluta architecto laboriosam aspernatur fuga dolorem placeat eius culpa, 
-                                        reprehenderit laborum rerum tempora maxime, error possimus facilis ut vitae necessitatibus omnis inventore explicabo. 
-                                        Tempora quisquam maiores cupiditate magnam.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="right-bloc">
-                                <div class="profile-picture">
-                                    <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="comment left-comment outline">
-                            <div class="left-bloc">
-                                <div class="profile-picture">
-                                    <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/100074061_3340287869337371_1716245584039378944_n.jpg?_nc_cat=104&ccb=1-3&_nc_sid=ad2b24&_nc_ohc=2VpF1gjF59AAX-2ZxfS&_nc_ht=scontent-frt3-1.xx&oh=0a314efbcc62e949a58bd76924d7e66b&oe=60D0686F" />
-                                </div>
-                            </div>
-
-                            <div class="right-bloc">
-                                <div class="comment-head">
-                                    <span class="date"> Il y a 2 jours </span>
-                                    <div class="poster"> Karine A. </div>
-                                </div>
-
-                                <div class="comment-text">
-                                    <p>
-                                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi debitis iure amet quidem dolorum omnis dolor. 
-                                        Fugit, optio eveniet ratione eos animi soluta architecto laboriosam aspernatur fuga dolorem placeat eius culpa, 
-                                        reprehenderit laborum rerum tempora maxime, error possimus facilis ut vitae necessitatibus omnis inventore explicabo. 
-                                        Tempora quisquam maiores cupiditate magnam.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <button class="button to-top">
+                    <img src="/assets/images/chevron-top.svg">
+                </button>
             </div>
         </div>
     </div>
