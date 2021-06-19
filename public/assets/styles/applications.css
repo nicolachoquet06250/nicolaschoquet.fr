@@ -160,6 +160,21 @@ ul > li.active:after {
     border-radius: 50px;
 }
 
+.apps-card-container {
+    --item-width: 0px;
+    --item-height: 0px;
+    height: var(--item-height);
+    position: relative;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+apps-card {
+    position: absolute;
+    width: 100%;
+}
+
 @media screen and (min-width: 1200px) {
     .button.next,
     .button.previous {

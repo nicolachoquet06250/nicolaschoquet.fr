@@ -13,7 +13,15 @@ export class Project extends Component {
         return `
         <div class="apps-card">
             <div class="header">
+                <button class="button previous">
+                    <img src="/assets/images/chevron-right-left.svg">
+                </button>
+
                 <slot name="header-img"></slot>
+
+                <button class="button next">
+                    <img src="/assets/images/chevron-right-left.svg">
+                </button>
             </div>
 
             <div class="body">
@@ -297,6 +305,34 @@ export class Project extends Component {
                 border: 2px solid darkred;
             }
 
+            .button {
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                border: 2px solid #d8d8d8;
+                background: white;
+                border-radius: 50px;
+                cursor: pointer;
+                top: 40%;
+            }
+
+            .button.previous {
+                left: 20px;
+                z-index: 1;
+            }
+
+            .button img {
+                width: 100%;
+                height: 100%;
+            }
+            
+            .button.previous img {
+                transform: rotate(180deg);
+            }
+
+            .button.next {
+                right: 20px;
+            }
 
 
             @media screen and (min-width: 992px) {
@@ -355,6 +391,30 @@ export class Project extends Component {
 
     get githubLink() {
         return this.getAttribute('github-link') ?? 'https://github.com/nicolachoquet06250?tab=repositories';
+    }
+
+    connectedCallback() {
+        console.log(this.root.querySelector('.header slot[name="header-img"]').assignedElements().length)
+
+        if (this.root.querySelector('.header slot[name="header-img"]').assignedElements().length < 2) {
+            this.root.querySelector('.header .button.next').style.display = 'none';
+            this.root.querySelector('.header .button.previous').style.display = 'none';
+
+            return;
+        }
+
+        let cmp = 0;
+        for (let img of Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())) {
+            img.setAttribute('id', `image-${this.uniqId}-${cmp}`);
+            cmp++;
+        }
+
+        this.root.querySelector('.header .button.next').addEventListener('click', () => {
+            console.log('next', this.root.querySelector('.header slot[name="header-img"]').assignedElements().length)
+        });
+        this.root.querySelector('.header .button.previous').addEventListener('click', () => {
+            console.log('previous', this.root.querySelector('.header slot[name="header-img"]').assignedElements().length);
+        });
     }
 }
 
