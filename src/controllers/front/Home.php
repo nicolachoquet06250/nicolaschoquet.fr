@@ -92,7 +92,7 @@ class Home extends Layout
             </div>
             <div class="account-card">
                 <div class="profile-picture">
-                    <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E">
+                    <img src="/assets/images/nicolas-choquet.jpg">
                 </div>
                 
                 <span class="full-name">Nicolas C.</span>
@@ -119,7 +119,7 @@ class Home extends Layout
             </div>
 
             <div class="col-12 col-lg-8 apps-card-container">
-                <apps-card id="item-0" user='{"firstname": "Nicolas", "lastname": "Choquet", "picture": "https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E"}'
+                <apps-card id="item-0" user='{"firstname": "Nicolas", "lastname": "Choquet", "picture": "/assets/images/nicolas-choquet.jpg"}'
                             github-link="https://github.com/nicolachoquet06250/norsys-pr..."
                             created-at="Créé le 18/06/2021">
                     <img src="/assets/images/norsys-presences.png" slot="header-img">
@@ -142,7 +142,7 @@ class Home extends Layout
                     </tabs-container>
                 </apps-card>
 
-                <apps-card id="item-1" user='{"firstname": "Nicolas", "lastname": "Choquet", "picture": "https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E"}'
+                <apps-card id="item-1" user='{"firstname": "Nicolas", "lastname": "Choquet", "picture": "/assets/images/nicolas-choquet.jpg"}'
                             github-link="https://github.com/nicolachoquet06250/norsys-pr..."
                             created-at="Créé le 18/06/2021">
                     <img src="/assets/images/norsys-presences.png" slot="header-img">

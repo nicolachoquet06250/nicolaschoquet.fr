@@ -42,7 +42,7 @@ export class Input extends Component {
 				color: #d4dcff;
 				padding: calc(1.5 * 8px) calc(1 * 8px);
 				display: block;
-				width: 100%;
+				width: calc(100% - 20px);
 				outline: 0;
 				min-height: 150px;
 				font-size: inherit;

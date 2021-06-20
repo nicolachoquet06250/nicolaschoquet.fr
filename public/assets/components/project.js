@@ -68,7 +68,7 @@ export class Project extends Component {
 
                     <div class="right-bloc">
                         <div class="profile-picture">
-                            <img src="https://scontent-frt3-1.xx.fbcdn.net/v/t1.6435-9/122094899_1645210225659993_4058643094356988337_n.jpg?_nc_cat=107&ccb=1-3&_nc_sid=09cbfe&_nc_ohc=UXd0bbB0aC8AX-HtVo5&_nc_ht=scontent-frt3-1.xx&oh=652deb1690fd09620b4cb406c9d12ff6&oe=60CF5D6E" />
+                            <img src="/assets/images/nicolas-choquet.jpg" />
                         </div>
                     </div>
                 </div>
