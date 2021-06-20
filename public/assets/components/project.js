@@ -319,6 +319,7 @@ export class Project extends Component {
             .button.previous {
                 left: 20px;
                 z-index: 1;
+                display: none;
             }
 
             .button img {
@@ -393,8 +394,24 @@ export class Project extends Component {
         return this.getAttribute('github-link') ?? 'https://github.com/nicolachoquet06250?tab=repositories';
     }
 
+    setImagesSize() {
+        let cmp = 0;
+        for (let img of Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())) {
+            img.setAttribute('id', `image-${this.uniqId}-${cmp}`);
+            img.style.left = (cmp * this.offsetWidth) + 'px';
+            cmp++;
+        }
+    }
+
     connectedCallback() {
-        console.log(this.root.querySelector('.header slot[name="header-img"]').assignedElements().length)
+        /*const setImagesSize = () => {
+            let cmp = 0;
+            for (let img of Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())) {
+                img.setAttribute('id', `image-${this.uniqId}-${cmp}`);
+                img.style.left = (cmp * this.offsetWidth) + 'px';
+                cmp++;
+            }
+        }*/
 
         if (this.root.querySelector('.header slot[name="header-img"]').assignedElements().length < 2) {
             this.root.querySelector('.header .button.next').style.display = 'none';
@@ -403,18 +420,80 @@ export class Project extends Component {
             return;
         }
 
-        let cmp = 0;
-        for (let img of Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())) {
-            img.setAttribute('id', `image-${this.uniqId}-${cmp}`);
-            cmp++;
+        this.setImagesSize();
+
+        window.addEventListener('resize', () => {
+            this.setImagesSize();
+        })
+
+        let hasCurrent = Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())
+            .reduce((r, c) => c.hasAttribute('data-current') ? true : r, false);
+
+        if (!hasCurrent) {
+            this.root.querySelector('.header slot[name="header-img"]').assignedElements()[0].setAttribute('data-current', '');
+            hasCurrent = true;
         }
 
+        let current = () => Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())
+            .reduce((r, c) => c.hasAttribute('data-current') ? c : r, null);
+
+        const exists = id => Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())
+            .reduce((r, c) => c.getAttribute('id') === id ? true : r, false);
+
+        const setCurrent = id => Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())
+            .map((c) => c.getAttribute('id') === id ? c.setAttribute('data-current', '') : c.removeAttribute('data-current'));
+
         this.root.querySelector('.header .button.next').addEventListener('click', () => {
-            console.log('next', this.root.querySelector('.header slot[name="header-img"]').assignedElements().length)
+            const next = parseInt(current().getAttribute('id').replace('image-' + this.uniqId + '-', '')) + 1;
+
+            if (exists('image-' + this.uniqId + '-' + next)) {
+                console.log('image-' + this.uniqId + '-' + next, 'exists');
+
+                setCurrent('image-' + this.uniqId + '-' + next);
+
+                this.root.querySelector('.header').style.setProperty('--scroll-width', this.offsetWidth + 'px');
+
+                for (let img of Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())) {
+                    const distLeft = parseInt(img.style.left.replace('px')) - this.offsetWidth;
+                    img.style.transition = 'left .3s ease-in-out';
+                    img.style.left = distLeft + 'px';
+                }
+            }
+
+            if (!exists('image-' + this.uniqId + '-' + (next + 1))) {
+                this.root.querySelector('.button.next').style.display = 'none';
+                this.root.querySelector('.button.previous').style.display = 'inline-block';
+            }
         });
+
         this.root.querySelector('.header .button.previous').addEventListener('click', () => {
-            console.log('previous', this.root.querySelector('.header slot[name="header-img"]').assignedElements().length);
+            const previous = parseInt(current().getAttribute('id').replace('image-' + this.uniqId + '-', '')) - 1;
+
+            if (exists('image-' + this.uniqId + '-' + previous)) {
+                console.log('image-' + this.uniqId + '-' + previous, 'exists');
+
+                setCurrent('image-' + this.uniqId + '-' + previous);
+
+                this.root.querySelector('.header').style.setProperty('--scroll-width', this.offsetWidth + 'px');
+
+                for (let img of Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())) {
+                    const distLeft = parseInt(img.style.left.replace('px')) + this.offsetWidth;
+                    img.style.transition = 'left .3s ease-in-out';
+                    img.style.left = distLeft + 'px';
+                }
+            }
+
+            if (!exists('image-' + this.uniqId + '-' + (previous - 1))) {
+                this.root.querySelector('.button.previous').style.display = 'none';
+                this.root.querySelector('.button.next').style.display = 'inline-block';
+            }
         });
+    }
+
+    disconnectedCallback() {
+        window.removeEventListener('resize', () => {
+            this.setImagesSize();
+        })
     }
 }
 

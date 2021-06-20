@@ -25,18 +25,26 @@ class Home extends Layout
     protected string $jsScript = <<<JS
         window.addEventListener('load', () => {
             const cards = Array.from(document.querySelectorAll('apps-card'));
-            const cardWidth = document.querySelector('apps-card').offsetWidth;
-            const cardHeight = document.querySelector('apps-card').offsetHeight;
+            const cardWidth = () => document.querySelector('apps-card').offsetWidth;
+            const cardHeight = () => document.querySelector('apps-card').offsetHeight;
             const cardsContainer = document.querySelector('.apps-card-container');
+            const resizeCards = () => {
+                cardsContainer.style.setProperty('--item-height', cardHeight() + 'px');
 
-            cardsContainer.style.setProperty('--item-width', cardWidth + 'px');
-            cardsContainer.style.setProperty('--item-height', cardHeight + 'px');
-
-            let cmp = 0;
-            for (let card of cards) {
-                card.style.left = cmp * cardWidth + 'px';
-                cmp++;
+                let cmp = 0;
+                for (let card of cards) {
+                    card.style.left = cmp * cardWidth() + 'px';
+                    cmp++;
+                }
             }
+
+            cardsContainer.style.setProperty('--item-width', cardWidth() + 'px');
+
+            resizeCards();
+
+            window.addEventListener('resize', () => {
+                resizeCards();
+            })
 
             document.querySelector('.button.next').addEventListener('click', () => {
                 const currentItemId = parseInt((cardsContainer.getAttribute('data-current') ?? '0'));
