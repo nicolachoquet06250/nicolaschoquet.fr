@@ -230,6 +230,10 @@ export class Project extends Component {
                 flex-direction: row;
             }
 
+            .apps-card .comments .comment p {
+                padding-left: 10px;
+            }
+
             .apps-card .comments .comment {
                 width: 100%;
                 border: 1px solid white;
