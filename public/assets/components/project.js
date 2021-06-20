@@ -408,15 +408,6 @@ export class Project extends Component {
     }
 
     connectedCallback() {
-        /*const setImagesSize = () => {
-            let cmp = 0;
-            for (let img of Array.from(this.root.querySelector('.header slot[name="header-img"]').assignedElements())) {
-                img.setAttribute('id', `image-${this.uniqId}-${cmp}`);
-                img.style.left = (cmp * this.offsetWidth) + 'px';
-                cmp++;
-            }
-        }*/
-
         if (this.root.querySelector('.header slot[name="header-img"]').assignedElements().length < 2) {
             this.root.querySelector('.header .button.next').style.display = 'none';
             this.root.querySelector('.header .button.previous').style.display = 'none';
