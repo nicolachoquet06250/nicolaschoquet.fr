@@ -29,8 +29,10 @@ class Layout
         return implode("\n", array_map(function(string $script) {
             $_script = explode('@', $script);
             if ($_script[0] === 'module') {
+                $_script[1] = str_replace(['[at]'], ['@'], $_script[1]);
                 return "<script type='module' src='{$_script[1]}' defer></script>";
             }
+            $script = str_replace(['[at]'], ['@'], $script);
             return "<script src='{$script}' defer></script>";
         }, $this->startScripts));
     }
