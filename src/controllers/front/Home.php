@@ -15,15 +15,12 @@ class Home extends Layout
     protected array $styles = [
         'https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css',
         'https://fonts.googleapis.com/css2?family=Roboto:wght@100;400&display=swap',
-        'https://fonts.googleapis.com/icon?family=Material+Icons',
-        //'https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css',
-        //'/assets/styles/applications.css'
+        'https://fonts.googleapis.com/icon?family=Material+Icons'
     ];
 
     protected array $startScripts = [
         'https://unpkg.com/material-components-web@latest/dist/material-components-web.js',
-        'module@/assets/ui-kit/components/index.js',
-        //'module@/assets/components/project.js'
+        'module@/assets/ui-kit/components/index.js'
     ];
 
     protected string $style = <<<CSS
@@ -86,18 +83,19 @@ class Home extends Layout
             overflow: hidden;
             position: relative;
             z-index: 0;
+            scroll-behavior: smooth;
         }
         
         .mdc-card__media--wrapper-slider__img-container {
-            --width: 0px;
-            --item-index: 0;
-            width: var(--width);
+            --img-width: 0px;
+            --img-item-index: 0;
+            width: var(--img-width);
             position: absolute;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            left: calc(var(--width) * var(--item-index));
+            left: calc(var(--img-width) * var(--img-item-index));
             overflow: hidden;
         }
         
@@ -149,7 +147,7 @@ class Home extends Layout
             background-size: cover;
             border: 4px solid darkgreen;
             position: absolute;
-            right: -50px;
+            right: 0;
             left: unset;
             top: -50px;
             box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),0px 1px 1px 0px rgba(0, 0, 0, 0.14),0px 1px 3px 0px rgba(0,0,0,.12);
@@ -217,15 +215,187 @@ class Home extends Layout
             right: 20px;
         }
 
-        @media screen and (max-width: 850px) {
-            .comments-bloc-card.mdc-card::after {
-                right: 0;
-            }
+        .cards-container {
+            position: relative;
+            overflow: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .card-container {
+            --card-width: 0px;
+            --card-item-index: 0;
+            position: absolute;
+            left: calc(var(--card-width) * var(--card-item-index));
+            width: var(--card-width);
+            overflow: hidden;
         }
     CSS;
 
     protected string $jsScript = <<<JS
-        window.addEventListener('load', () => {
+        const isCurrent = target => target.hasAttribute('data-current');
+        const unsetCurrent = target => target.removeAttribute('data-current');
+        const setCurrent = target => target.setAttribute('data-current', '');
+
+        const getCurrentImageInProject = (project, directScroll = false) => {
+            const current = Array.from(project.querySelectorAll('.mdc-card__media--wrapper-slider__img-container'))
+            .reduce(
+                (r, c) => isCurrent(c) ? c : r, 
+                project.querySelectorAll('.mdc-card__media--wrapper-slider__img-container')[0]
+            );
+
+            if (!isCurrent(current)) setCurrent(current);
+
+            if (directScroll) current.scrollTo(0, 0);
+
+            return current;
+        };
+
+        const getCurrentProject = () => {
+            const current = Array.from(document.querySelectorAll('.cards-container .card-container'))
+            .reduce(
+                (r, c) => isCurrent(c) ? c : r, 
+                document.querySelectorAll('.cards-container .card-container')[0]
+            );
+            
+            if (!isCurrent(current)) setCurrent(current);
+
+            const currentImage = getCurrentImageInProject(current, true);
+
+            return {
+                currentProject: current, 
+                currentImage
+            };
+        };
+
+        const getNextProject = () => {
+            const { currentProject: current } = getCurrentProject();
+
+            let next = current.nextElementSibling;
+
+            if (!next) {
+                next = current.parentElement.querySelector('#project-0');
+            }
+
+            return next;
+        }
+
+        const getPreviousProject = () => {
+            const { currentProject: current } = getCurrentProject();
+
+            let previous = current.previousElementSibling;
+
+            if (!previous) {
+                const cards = current.parentElement.querySelectorAll('.card-container');
+                previous = cards[cards.length - 1]
+            }
+
+            return previous;
+        }
+
+        const saveCurrentProject = target => {
+            Array.from(document.querySelector('.cards-container').querySelectorAll('.card-container')).map(unsetCurrent);
+
+            if (target) setCurrent(target);
+        };
+        const saveCurrentImageFromProject = (index, project) => {
+            Array.from(project.querySelectorAll('.mdc-card__media--wrapper-slider__img-container'))
+                .map(c => {
+                    if (!isCurrent(c) && c.getAttribute('id') === project.getAttribute('id') + '-img-' + index) {
+                        setCurrent(c);
+                    } else if(!isCurrent(c)) {
+                        unsetCurrent(c);
+                    }
+                });
+        };
+        
+        const ProjectSliderClickHandler = e => {
+            const { target } = e;
+
+            if (target.parentElement.classList.contains('next-btn')) {
+                saveCurrentProject(getNextProject());
+
+                const {currentProject: current} = getCurrentProject();
+
+                for (let project of Array.from(current.parentElement.querySelectorAll('.card-container'))) {
+                    const left = parseInt(project.style.getPropertyValue('--card-width').replace('px', '')) 
+                        * parseInt(project.style.getPropertyValue('--card-item-index'));
+                    const distLeft = left - project.offsetWidth * parseInt(current.getAttribute('id').replace('project-', ''));
+                    project.style.transition = 'left .3s ease-in-out';
+                    project.style.left = distLeft + 'px';
+                }
+            } else {
+                saveCurrentProject(getPreviousProject());
+
+                const {currentProject: current} = getCurrentProject();
+
+                for (let project of Array.from(current.parentElement.querySelectorAll('.card-container'))) {
+                    const left = parseInt(project.style.getPropertyValue('--card-width').replace('px', '')) 
+                        * parseInt(project.style.getPropertyValue('--card-item-index'));
+                    const distLeft = left + project.offsetWidth * -parseInt(current.getAttribute('id').replace('project-', ''));
+                    project.style.transition = 'left .3s ease-in-out';
+                    project.style.left = distLeft + 'px';
+                }
+            }
+        };
+        const imageSliderClickHandler = e => {
+            const { target } = e;
+
+            console.log(getCurrentProject());
+
+            if (target.classList.contains('next-btn')) {
+                console.log('image suivant')
+            } else {
+                console.log('image précédent')
+            }
+        };
+
+        const resize = () => {
+            const maxHeight = () => Array.from(document.querySelectorAll('.card-container')).reduce((r, c) => r > c.offsetHeight ? r : c.offsetHeight, 0);
+
+            document.querySelector('.cards-container').style.height = maxHeight() + 'px';
+
+            Array.from(document.querySelectorAll('.card-container')).map((target, cIndex) => {
+                target.style.setProperty('--card-width', target.parentElement.offsetWidth + 'px')
+                target.style.setProperty('--card-item-index', cIndex.toString())
+
+                if (!target.hasAttribute('id')) {
+                    target.setAttribute('id', 'project-' + cIndex);
+                }
+
+                Array.from(target.querySelectorAll('.mdc-card__media--wrapper-slider')).map(s => 
+                    Array.from(s.querySelectorAll('.mdc-card__media--wrapper-slider__img-container')).map((i, iIndex) => {
+                        i.style.setProperty('--img-width', s.offsetWidth + 'px')
+                        i.style.setProperty('--img-item-index', iIndex.toString())
+
+                        if (!i.hasAttribute('id')) {
+                            i.setAttribute('id', 'project-' + cIndex + '-img-' + iIndex);
+                        }
+                    })
+                );
+
+                if (target.querySelector('.mdc-touch-target-wrapper > .next-btn') && target.querySelector('.mdc-touch-target-wrapper > .previous-btn')) {
+                    // Suppressopn des évenements
+                    target.querySelector('.mdc-touch-target-wrapper .next-btn').removeEventListener('click', ProjectSliderClickHandler)
+                    target.querySelector('.mdc-touch-target-wrapper .previous-btn').removeEventListener('click', ProjectSliderClickHandler)
+
+                    // Ajout des évenements
+                    target.querySelector('.mdc-touch-target-wrapper .next-btn').addEventListener('click', ProjectSliderClickHandler)
+                    target.querySelector('.mdc-touch-target-wrapper .previous-btn').addEventListener('click', ProjectSliderClickHandler)
+                }
+
+                if (target.querySelector('.mdc-card__media--wrapper-slider .next-btn') && target.querySelector('.mdc-card__media--wrapper-slider .previous-btn')) {
+                    // Suppressopn des évenements
+                    target.querySelector('.mdc-card__media--wrapper-slider .next-btn').removeEventListener('click', imageSliderClickHandler)
+                    target.querySelector('.mdc-card__media--wrapper-slider .previous-btn').removeEventListener('click', imageSliderClickHandler)
+
+                    // Ajout des évenements
+                    target.querySelector('.mdc-card__media--wrapper-slider .next-btn').addEventListener('click', imageSliderClickHandler)
+                    target.querySelector('.mdc-card__media--wrapper-slider .previous-btn').addEventListener('click', imageSliderClickHandler)
+                }
+            });
+        }
+
+        const initMDCComponents = () => {
             const { MDCTopAppBar } = mdc.topAppBar;
             const { MDCDrawer } = mdc.drawer;
             const { MDCList } = mdc.list;
@@ -238,22 +408,19 @@ class Home extends Layout
             const drawer = MDCDrawer.attachTo(document.querySelector('.mdc-drawer'));
             
             topAppBar.setScrollTarget(document.getElementById('main-content'));
-            topAppBar.listen('MDCTopAppBar:nav', () => {
-                drawer.open = !drawer.open;
-            });
+            topAppBar.listen('MDCTopAppBar:nav', () => drawer.open = !drawer.open);
             
             const fabRipple = new MDCRipple(document.querySelector('.mdc-fab'));
+        }
+
+        window.addEventListener('load', () => {
+            getCurrentProject();
+
+            initMDCComponents();
             
-            const resize = () => {
-                Array.from(document.querySelectorAll('.mdc-card__media--wrapper-slider .mdc-card__media--wrapper-slider__img-container')).map((i, index) => {
-                    i.style.setProperty('--width', i.parentElement.parentElement.offsetWidth + 'px')
-                    i.style.setProperty('--item-index', index.toString())
-                })
-            }
-            
-            resize()
-            
-            window.addEventListener('resize', resize)
+            window.addEventListener('resize', resize);
+
+            resize();
         });
     JS;
 
@@ -308,7 +475,7 @@ class Home extends Layout
                 <div class="mdc-layout-grid__inner">
                     <div class="mdc-layout-grid__cell--span-2"></div>
                     
-                    <div class="mdc-layout-grid__cell--span-8">
+                    <div class="mdc-layout-grid__cell--span-8 cards-container">
                         <!-- projet 1 -->
                         <div class="card-container">
                             <div class="mdc-card app-card" style="margin-bottom: 70px">
@@ -332,13 +499,13 @@ class Home extends Layout
                                     </div>
                                 
                                     <div class="mdc-touch-target-wrapper">
-                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary">
+                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary previous-btn">
                                             <div class="mdc-fab__ripple"></div>
                                             <span class="material-icons">arrow_back_ios_new</span>
                                             <div class="mdc-fab__touch"></div>
                                         </button>
                                         
-                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary">
+                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary next-btn">
                                             <div class="mdc-fab__ripple"></div>
                                             <span class="material-icons">arrow_forward_ios</span>
                                             <div class="mdc-fab__touch"></div>
@@ -348,6 +515,248 @@ class Home extends Layout
                                 
                                 <div class="mdc-card-wrapper__text-section">
                                     <h2 class="mdc-card__title">Norsys Présences</h2>
+                                    
+                                    <h3 class="mdc-card__subhead">Gestion de présences dans les agences Norsys</h3>
+                                </div>
+                                
+                                <div class="mdc-card-wrapper__text-section">
+                                    <p class="mdc-card__supporting-text">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium, deleniti dignissimos eius eligendi excepturi facilis in laudantium magni, modi odio odit quasi rem saepe sequi vel. A beatae dolorem placeat sunt tempore. Aliquid assumenda commodi, illum incidunt ipsa ipsam iure laborum nobis placeat quibusdam recusandae, sed sunt ut veniam voluptatum.
+                                    </p>
+                                </div>
+                                
+                                <div class="mdc-card__actions">
+                                    <button class="mdc-button mdc-card__action mdc-card__action--button mdc-ripple-upgraded">
+                                        <span class="mdc-button__label">https://github.com/nicolachoquet06250/nicolaschoquet.fr.git</span>
+                                        <div class="mdc-button__ripple"></div>
+                                    </button>
+                                    
+                                    <span>Créé le 18/06/2021</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mdc-card comments-bloc-card" style="margin-bottom: 20px;">
+                                <div class="mdc-card-wrapper__text-section">
+                                    <h2 class="mdc-card__title">Commentaires</h2>
+                                </div>
+                                
+                                <div class="mdc-card-wrapper__text-section">
+                                    <k-input type="textarea" placeholder="Saisisser votre commentaire ici..."></k-input>
+                                </div>
+                                
+                                <div class="mdc-card__actions">
+                                    <button class="mdc-button mdc-card__action mdc-card__action--button mdc-ripple-upgraded">
+                                        <span class="mdc-button__label">Envoyer</span>
+                                        <div class="mdc-button__ripple"></div>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mdc-card comments-card">
+                                <div class="mdc-card-wrapper__text-section">
+                                    <div class="mdc-card comment-card">
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <div class="profile-picture">
+                                                <img src="/assets/images/nicolas-choquet.jpg">
+                                            </div>
+                                        
+                                            <div class="comment-profile">
+                                                <h2 class="mdc-card__title">Moi</h2>
+                                                
+                                                <h3>Hier</h3>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <p>
+                                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab deleniti, ex expedita incidunt laboriosam nesciunt perspiciatis quidem quo soluta tenetur?
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mdc-card comment-card">
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <div class="profile-picture">
+                                                <img src="/assets/images/maman-et-yann.jpg">
+                                            </div>
+                                        
+                                            <div class="comment-profile">
+                                                <h2 class="mdc-card__title">Karine A.</h2>
+                                                
+                                                <h3>Il y a 2 jours</h3>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <p>
+                                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab deleniti, ex expedita incidunt laboriosam nesciunt perspiciatis quidem quo soluta tenetur?
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- projet 2 -->
+                        <div class="card-container">
+                            <div class="mdc-card app-card" style="margin-bottom: 70px">
+                                <div class="mdc-card__media mdc-card__media--16-9 mdc-card__media--wrapper">
+                                    <div class="mdc-card__media--wrapper-slider">
+                                        <div class="previous-btn">chevron_left</div>
+
+                                        <div class="mdc-card__media--wrapper-slider__img-container">
+                                            <img src="data:image/svg+xml,%3Csvg%20width%3D%22344%22%20height%3D%22194%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cdefs%3E%3Cpath%20id%3D%22a%22%20d%3D%22M-1%200h344v194H-1z%22%2F%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate(1)%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23BDBDBD%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20mask%3D%22url(%23b)%22%3E%3Cpath%20d%3D%22M173.65%2069.238L198.138%2027%20248%20112.878h-49.3c.008.348.011.697.011%201.046%200%2028.915-23.44%2052.356-52.355%2052.356C117.44%20166.28%2094%20142.84%2094%20113.924c0-28.915%2023.44-52.355%2052.356-52.355%2010%200%2019.347%202.804%2027.294%207.669zm0%200l-25.3%2043.64h50.35c-.361-18.478-10.296-34.61-25.05-43.64z%22%20fill%3D%22%23757575%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" >
+                                        </div>
+                                        
+                                        <div class="mdc-card__media--wrapper-slider__img-container">
+                                            <img src="data:image/svg+xml,%3Csvg%20width%3D%22344%22%20height%3D%22194%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cdefs%3E%3Cpath%20id%3D%22a%22%20d%3D%22M-1%200h344v194H-1z%22%2F%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate(1)%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23BDBDBD%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20mask%3D%22url(%23b)%22%3E%3Cpath%20d%3D%22M173.65%2069.238L198.138%2027%20248%20112.878h-49.3c.008.348.011.697.011%201.046%200%2028.915-23.44%2052.356-52.355%2052.356C117.44%20166.28%2094%20142.84%2094%20113.924c0-28.915%2023.44-52.355%2052.356-52.355%2010%200%2019.347%202.804%2027.294%207.669zm0%200l-25.3%2043.64h50.35c-.361-18.478-10.296-34.61-25.05-43.64z%22%20fill%3D%22%23757575%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" >
+                                        </div>
+                                        
+                                        <div class="mdc-card__media--wrapper-slider__img-container">
+                                            <img src="data:image/svg+xml,%3Csvg%20width%3D%22344%22%20height%3D%22194%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cdefs%3E%3Cpath%20id%3D%22a%22%20d%3D%22M-1%200h344v194H-1z%22%2F%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate(1)%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23BDBDBD%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20mask%3D%22url(%23b)%22%3E%3Cpath%20d%3D%22M173.65%2069.238L198.138%2027%20248%20112.878h-49.3c.008.348.011.697.011%201.046%200%2028.915-23.44%2052.356-52.355%2052.356C117.44%20166.28%2094%20142.84%2094%20113.924c0-28.915%2023.44-52.355%2052.356-52.355%2010%200%2019.347%202.804%2027.294%207.669zm0%200l-25.3%2043.64h50.35c-.361-18.478-10.296-34.61-25.05-43.64z%22%20fill%3D%22%23757575%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" >
+                                        </div>
+
+                                        <div class="next-btn">chevron_right</div>
+                                    </div>
+                                
+                                    <div class="mdc-touch-target-wrapper">
+                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary previous-btn">
+                                            <div class="mdc-fab__ripple"></div>
+                                            <span class="material-icons">arrow_back_ios_new</span>
+                                            <div class="mdc-fab__touch"></div>
+                                        </button>
+                                        
+                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary next-btn">
+                                            <div class="mdc-fab__ripple"></div>
+                                            <span class="material-icons">arrow_forward_ios</span>
+                                            <div class="mdc-fab__touch"></div>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mdc-card-wrapper__text-section">
+                                    <h2 class="mdc-card__title">Norsys Présences 2</h2>
+                                    
+                                    <h3 class="mdc-card__subhead">Gestion de présences dans les agences Norsys</h3>
+                                </div>
+                                
+                                <div class="mdc-card-wrapper__text-section">
+                                    <p class="mdc-card__supporting-text">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium, deleniti dignissimos eius eligendi excepturi facilis in laudantium magni, modi odio odit quasi rem saepe sequi vel. A beatae dolorem placeat sunt tempore. Aliquid assumenda commodi, illum incidunt ipsa ipsam iure laborum nobis placeat quibusdam recusandae, sed sunt ut veniam voluptatum.
+                                    </p>
+                                </div>
+                                
+                                <div class="mdc-card__actions">
+                                    <button class="mdc-button mdc-card__action mdc-card__action--button mdc-ripple-upgraded">
+                                        <span class="mdc-button__label">https://github.com/nicolachoquet06250/nicolaschoquet.fr.git</span>
+                                        <div class="mdc-button__ripple"></div>
+                                    </button>
+                                    
+                                    <span>Créé le 18/06/2021</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mdc-card comments-bloc-card" style="margin-bottom: 20px;">
+                                <div class="mdc-card-wrapper__text-section">
+                                    <h2 class="mdc-card__title">Commentaires</h2>
+                                </div>
+                                
+                                <div class="mdc-card-wrapper__text-section">
+                                    <k-input type="textarea" placeholder="Saisisser votre commentaire ici..."></k-input>
+                                </div>
+                                
+                                <div class="mdc-card__actions">
+                                    <button class="mdc-button mdc-card__action mdc-card__action--button mdc-ripple-upgraded">
+                                        <span class="mdc-button__label">Envoyer</span>
+                                        <div class="mdc-button__ripple"></div>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mdc-card comments-card">
+                                <div class="mdc-card-wrapper__text-section">
+                                    <div class="mdc-card comment-card">
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <div class="profile-picture">
+                                                <img src="/assets/images/nicolas-choquet.jpg">
+                                            </div>
+                                        
+                                            <div class="comment-profile">
+                                                <h2 class="mdc-card__title">Moi</h2>
+                                                
+                                                <h3>Hier</h3>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <p>
+                                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab deleniti, ex expedita incidunt laboriosam nesciunt perspiciatis quidem quo soluta tenetur?
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mdc-card comment-card">
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <div class="profile-picture">
+                                                <img src="/assets/images/maman-et-yann.jpg">
+                                            </div>
+                                        
+                                            <div class="comment-profile">
+                                                <h2 class="mdc-card__title">Karine A.</h2>
+                                                
+                                                <h3>Il y a 2 jours</h3>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="mdc-card-wrapper__text-section">
+                                            <p>
+                                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab deleniti, ex expedita incidunt laboriosam nesciunt perspiciatis quidem quo soluta tenetur?
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- projet 3 -->
+                        <div class="card-container">
+                            <div class="mdc-card app-card" style="margin-bottom: 70px">
+                                <div class="mdc-card__media mdc-card__media--16-9 mdc-card__media--wrapper">
+                                    <div class="mdc-card__media--wrapper-slider">
+                                        <div class="previous-btn">chevron_left</div>
+
+                                        <div class="mdc-card__media--wrapper-slider__img-container">
+                                            <img src="data:image/svg+xml,%3Csvg%20width%3D%22344%22%20height%3D%22194%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cdefs%3E%3Cpath%20id%3D%22a%22%20d%3D%22M-1%200h344v194H-1z%22%2F%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate(1)%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23BDBDBD%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20mask%3D%22url(%23b)%22%3E%3Cpath%20d%3D%22M173.65%2069.238L198.138%2027%20248%20112.878h-49.3c.008.348.011.697.011%201.046%200%2028.915-23.44%2052.356-52.355%2052.356C117.44%20166.28%2094%20142.84%2094%20113.924c0-28.915%2023.44-52.355%2052.356-52.355%2010%200%2019.347%202.804%2027.294%207.669zm0%200l-25.3%2043.64h50.35c-.361-18.478-10.296-34.61-25.05-43.64z%22%20fill%3D%22%23757575%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" >
+                                        </div>
+                                        
+                                        <div class="mdc-card__media--wrapper-slider__img-container">
+                                            <img src="data:image/svg+xml,%3Csvg%20width%3D%22344%22%20height%3D%22194%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cdefs%3E%3Cpath%20id%3D%22a%22%20d%3D%22M-1%200h344v194H-1z%22%2F%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate(1)%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23BDBDBD%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20mask%3D%22url(%23b)%22%3E%3Cpath%20d%3D%22M173.65%2069.238L198.138%2027%20248%20112.878h-49.3c.008.348.011.697.011%201.046%200%2028.915-23.44%2052.356-52.355%2052.356C117.44%20166.28%2094%20142.84%2094%20113.924c0-28.915%2023.44-52.355%2052.356-52.355%2010%200%2019.347%202.804%2027.294%207.669zm0%200l-25.3%2043.64h50.35c-.361-18.478-10.296-34.61-25.05-43.64z%22%20fill%3D%22%23757575%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" >
+                                        </div>
+                                        
+                                        <div class="mdc-card__media--wrapper-slider__img-container">
+                                            <img src="data:image/svg+xml,%3Csvg%20width%3D%22344%22%20height%3D%22194%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cdefs%3E%3Cpath%20id%3D%22a%22%20d%3D%22M-1%200h344v194H-1z%22%2F%3E%3C%2Fdefs%3E%3Cg%20transform%3D%22translate(1)%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cmask%20id%3D%22b%22%20fill%3D%22%23fff%22%3E%3Cuse%20xlink%3Ahref%3D%22%23a%22%2F%3E%3C%2Fmask%3E%3Cuse%20fill%3D%22%23BDBDBD%22%20xlink%3Ahref%3D%22%23a%22%2F%3E%3Cg%20mask%3D%22url(%23b)%22%3E%3Cpath%20d%3D%22M173.65%2069.238L198.138%2027%20248%20112.878h-49.3c.008.348.011.697.011%201.046%200%2028.915-23.44%2052.356-52.355%2052.356C117.44%20166.28%2094%20142.84%2094%20113.924c0-28.915%2023.44-52.355%2052.356-52.355%2010%200%2019.347%202.804%2027.294%207.669zm0%200l-25.3%2043.64h50.35c-.361-18.478-10.296-34.61-25.05-43.64z%22%20fill%3D%22%23757575%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" >
+                                        </div>
+
+                                        <div class="next-btn">chevron_right</div>
+                                    </div>
+                                
+                                    <div class="mdc-touch-target-wrapper">
+                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary previous-btn">
+                                            <div class="mdc-fab__ripple"></div>
+                                            <span class="material-icons">arrow_back_ios_new</span>
+                                            <div class="mdc-fab__touch"></div>
+                                        </button>
+                                        
+                                        <button class="mdc-fab mdc-fab--mini mdc-fab--touch theme--primary next-btn">
+                                            <div class="mdc-fab__ripple"></div>
+                                            <span class="material-icons">arrow_forward_ios</span>
+                                            <div class="mdc-fab__touch"></div>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mdc-card-wrapper__text-section">
+                                    <h2 class="mdc-card__title">Norsys Présences 3</h2>
                                     
                                     <h3 class="mdc-card__subhead">Gestion de présences dans les agences Norsys</h3>
                                 </div>
